@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-    <img src="img/noisy_gaussian.png" alt="Logo" width="80" height="80">
+    <img src="img/noisy_gaussian.jpg" alt="Logo" width="80" height="80">
 
   <h3 align="center">cuPPS</h3>
 
@@ -44,6 +44,8 @@ And then run it
 ./modelb
 ```
 The solver outputs data by default to a directory called `data` from where it's called. The output files contain raw data of the states of the field at each timestep at which they're written out.
+
+<img src="img/modelb.jpg" alt="Model B" width="80" height="80">
 
 ## What it calculates
 See <a href=""><strong>here</strong></a>.
