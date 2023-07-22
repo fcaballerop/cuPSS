@@ -20,7 +20,7 @@ This library provides a framework for numerically integrating systems of 1st ord
 Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>docs</strong></a>.
 
 ## Compiling a solver
-A number of example solvers can be found in the directory solvers. They can be compiled by compiling them together with the source files found in the directory `src`, for instance, the solver for model B, contained in `solvers/modelb.cpp`, can be compiled by
+A number of example solvers can be found in the `examples` directory. They can be compiled by compiling them together with the source files found in the directory `src`, for instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
 
 ```
 nvcc -O2 examples/modelb.cpp src/field_init.cpp src/field.cpp src/term_init.cpp src/term.cpp src/evolver.cpp src/field_kernels.cu src/term_kernels.cu -lcufft -lfftw3f -lcurand -DWITHCUDA -o modelb
