@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-    <img src="img/noisy_gaussian.jpg">
+    <img src="img/noisy_gaussian.jpg" width=156 height=160>
 
   <h3 align="center">cuPPS</h3>
 
