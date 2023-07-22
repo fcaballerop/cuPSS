@@ -5,9 +5,9 @@
   <h3 align="center">cuPPS</h3>
 
   <p align="center">
-    A pseudospectral solver for systems of stochastics PDEs
+    A pseudospectral solver for systems of stochastics PDEs written in C++ & CUDA
     <br />
-    <a href=""><strong>Read the docs »</strong></a>
+    <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>Read the docs »</strong></a>
     <br />
     <br />
   </p>
@@ -17,7 +17,7 @@
 
 This library provides a framework for numerically integrating systems of 1st order PDEs (stochastic or deterministic) in a rectangular lattice, using a pseudospectral method. The integrator runs on NVIDIA GPUs through CUDA, but also supports running entirely on CPU, which can be faster for certain smaller lattices.
 
-Detailed information about how to code a solver using this library can be found in the <a href=""><strong>docs</strong></a>.
+Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>docs</strong></a>.
 
 ## Compiling a solver
 A number of example solvers can be found in the directory solvers. They can be compiled by compiling them together with the source files found in the directory `src`, for instance, the solver for model B, contained in `solvers/modelb.cpp`, can be compiled by
