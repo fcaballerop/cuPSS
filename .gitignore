@@ -1,0 +1,9 @@
+utils/
+solvers/
+.cache/
+.vscode/
+.neovim.json
+*.idx
+*.sh
+*.o
+*.a
