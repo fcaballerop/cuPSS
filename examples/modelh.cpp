@@ -42,7 +42,7 @@
 
 int main(int argc, char **argv)
 {
-    evolver system(1, Nx, Ny, 1.0f, 1.0f, 0.0001f, 100);
+    evolver system(1, Nx, Ny, 1.0f, 1.0f, 0.01f, 100);
 
     system.createField("iqxphi", false);// 0
     system.createField("iqyphi", false);// 1
@@ -56,13 +56,13 @@ int main(int argc, char **argv)
     // CONSTANTS
     // v and Q
     float friction = 0.0f;
-    float eta = 0.01f;
+    float eta = 1.0f;
     // phi
     float a = -1.0f;
     float b = 1.0f;
     float phi0 = std::sqrt(-a/b);
     float k = 4.0f;
-    float ka = k;
+    float ka = -k;
     float D = 0.01f;
 
     system.fields[7]->isNoisy = true;
@@ -119,10 +119,7 @@ int main(int argc, char **argv)
             float ix = (float)i;
             float iy = (float)j;
             int index = j*Nx+i;
-            if (j < Ny/2)
-                system.fields[7]->real_array[index].x = -1.0f;
-            else
-                system.fields[7]->real_array[index].x = 1.0f;
+            system.fields[7]->real_array[index].x = 0.001f * (float)(rand() % 200 - 100);
             system.fields[7]->real_array[index].y = 0.0f;
         }
     }
