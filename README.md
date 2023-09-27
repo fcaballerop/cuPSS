@@ -36,14 +36,14 @@ nvcc -O2 examples/modelb.cpp src/field_init.cpp src/field.cpp src/term_init.cpp 
 Alternatively, the source files can be compiled into a library to then link to each solver. To do so, we can run the following once:
 ```
 cd src/
-g++ -c *cpp -DWITHCUDA -O2
+nvcc -c *cpp -DWITHCUDA -O2
 nvcc -c *cu -DWITHCUDA -O2
 ar rcs libcupss.a *o
 ```
 
 This will create a static library called cupss in the file `libcupss.a`. To compile a solver, we can then simply compile it linking it to this library:
 ```
-nvcc examples/modelb.cpp -Lsrc/ -lcufft -lfftw3f -curand -lcupss -O2 -o modelb
+nvcc examples/modelb.cpp -Lsrc/ -lcufft -lfftw3f -lcurand -lcupss -O2 -o modelb
 ```
 
 And then run it
