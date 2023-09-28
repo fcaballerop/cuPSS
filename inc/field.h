@@ -37,6 +37,7 @@ class field
     curandRngType_t rng_d;
     curandOrdering_t order_d;
 
+
     public:
     field(int, int, float, float);
 
@@ -100,6 +101,9 @@ class field
     // boundary conditions
     bool hasBC;
     void (*boundary) (float2 *, int, int);
+
+    dim3 threads_per_block;
+    dim3 blocks;
 
     int setRHS(float);
     int updateTerms();

@@ -36,13 +36,13 @@ int field::setRHS(float dt)
         if (!dynamic)
         {
             setNotDynamic_gpu(terms_d, terms.size(), implicit_terms, implicit.size(), 
-                    comp_array_d, sx, sy, stepqx, stepqy, precomp_implicit_d);
+                    comp_array_d, sx, sy, stepqx, stepqy, precomp_implicit_d, blocks, threads_per_block);
         }
         else 
         {
             setDynamic_gpu(terms_d, terms.size(), implicit_terms, implicit.size(),
                     comp_array_d, sx, sy, stepqx, stepqy, dt, precomp_implicit_d,
-                    isNoisy, noise_fourier, precomp_noise_d);
+                    isNoisy, noise_fourier, precomp_noise_d, blocks, threads_per_block);
         }
     }
     else 
@@ -231,7 +231,7 @@ void field::dealias()
     if (isCUDA)
     {
         cudaDeviceSynchronize();
-        dealias_gpu(comp_array_d, comp_dealiased_d, sx, sy, aliasing_order);
+        dealias_gpu(comp_array_d, comp_dealiased_d, sx, sy, aliasing_order, blocks, threads_per_block);
     }
     else {
         for (int j = 0; j < sy; j++)
@@ -308,9 +308,9 @@ void field::normalize()
     if (isCUDA)
     {
         cudaDeviceSynchronize();
-        normalize_gpu(real_array_d, sx, sy);
+        normalize_gpu(real_array_d, sx, sy, blocks, threads_per_block);
         if (needsaliasing)
-            normalize_gpu(real_dealiased_d, sx, sy);
+            normalize_gpu(real_dealiased_d, sx, sy, blocks, threads_per_block);
     }
     else
     {
@@ -344,7 +344,7 @@ void field::createNoise()
             // curandGenerateNormal(gen_d, noise_comp_d_i, sx*sy, 0.0f, 0.707f);
             curandGenerateNormal(gen_d, gen_noise, sx*sy, 0.0f, 1.0f);
             cudaDeviceSynchronize();
-            copyToFloat2_gpu(gen_noise, noise_real, sx, sy);
+            copyToFloat2_gpu(gen_noise, noise_real, sx, sy, blocks, threads_per_block);
             cudaDeviceSynchronize();
             cufftExecC2C(plan_gpu, noise_real, noise_fourier, CUFFT_FORWARD);
             // correctNoiseAmplitude_gpu(noise_fourier, precomp_noise_d, sx, sy);

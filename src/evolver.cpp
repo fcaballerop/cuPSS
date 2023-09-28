@@ -30,6 +30,17 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
     // dy = _dy;
     // dt = _dt;
     dtsqrt = std::sqrt(_dt);
+
+    if (sy == 1)
+    {
+        blocks = 1;
+        threads_per_block = sx;
+    }
+    else 
+    {
+        threads_per_block = dim3(32,32);
+        blocks = dim3(sx/32,sy/32);
+    }
 }
 
 void evolver::addField(field *newField)
@@ -51,6 +62,8 @@ int evolver::createField(std::string name, bool dynamic)
     newField->name = name;
     newField->isCUDA = with_cuda;
     newField->dynamic = dynamic;
+    newField->blocks = blocks;
+    newField->threads_per_block = threads_per_block;
     fields.push_back(newField);
     return 0;
 }
@@ -299,6 +312,9 @@ int evolver::createTerm(std::string _field, const std::vector<pres> &_prefactors
     {
         newTerm->prefactors_h.push_back(_prefactors[i]);
     }
+
+    newTerm->blocks = blocks;
+    newTerm->threads_per_block = threads_per_block;
 
     fields[field_index]->terms.push_back(newTerm);
     return 0;

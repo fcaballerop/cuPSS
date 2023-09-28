@@ -17,6 +17,8 @@ private:
     const float dx, dy;
     const int writeEveryNSteps;
 public:
+    dim3 threads_per_block;
+    dim3 blocks;
     float dt;
     float dtsqrt;
     std::vector<field*> fields;

@@ -3,78 +3,36 @@
 
 #include "../inc/field_kernels.cuh"
 
-extern "C" void setNotDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, float stepqx, float stepqy, float *precomp)
+extern "C" void setNotDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, float stepqx, float stepqy, float *precomp, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     setNotDynamic_k<<<blocks, threadsPerBlock>>>(terms, len, implicits, i_len, out, sx, sy, stepqx, stepqy, precomp);
 }
 
-extern "C" void setDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, float stepqx, float stepqy, float dt, float *precomp, bool isNoisy, float2 *noise_r, float* precomp_noise)
+extern "C" void setDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, float stepqx, float stepqy, float dt, float *precomp, bool isNoisy, float2 *noise_r, float* precomp_noise, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     setDynamic_k<<<blocks, threadsPerBlock>>>(terms, len, implicits, i_len, out, sx, sy, stepqx, stepqy, dt, precomp, isNoisy, noise_r, precomp_noise);
 }
 
-extern "C" void createNoise_gpu(float *noise_comp_d_r, float *noise_comp_d_i, int sx, int sy, float *amplitude)
+extern "C" void createNoise_gpu(float *noise_comp_d_r, float *noise_comp_d_i, int sx, int sy, float *amplitude, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     cudaDeviceSynchronize();
     createNoise_k<<<blocks,threadsPerBlock>>>(noise_comp_d_r, noise_comp_d_i, sx, sy, amplitude);
     cudaDeviceSynchronize();
     conjNoise_k<<<blocks,threadsPerBlock>>>(noise_comp_d_r, noise_comp_d_i, sx, sy);
 }
 
-extern "C" void dealias_gpu(float2 *comp_array_d, float2 *comp_dealiased_d, int sx, int sy, int aliasing_order)
+extern "C" void dealias_gpu(float2 *comp_array_d, float2 *comp_dealiased_d, int sx, int sy, int aliasing_order, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     dealias_k<<<blocks, threadsPerBlock>>>(comp_array_d, comp_dealiased_d, sx, sy, aliasing_order);
 }
 
-extern "C" void copyToFloat2_gpu(float *in, float2 *out, int sx, int sy)
+extern "C" void copyToFloat2_gpu(float *in, float2 *out, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1)
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     copyToFloat2_k<<<blocks, threadsPerBlock>>>(in, out, sx, sy);
 }
 
-extern "C" void correctNoiseAmplitude_gpu(float2 *noise_fourier, float *precomp_noise_d, int sx, int sy)
+extern "C" void correctNoiseAmplitude_gpu(float2 *noise_fourier, float *precomp_noise_d, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1)
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     correctNoiseAmplitude_k<<<blocks, threadsPerBlock>>>(noise_fourier, precomp_noise_d, sx, sy);
 }
 
@@ -141,15 +99,8 @@ __global__ void conjNoise_k(float *noise_comp_d_r, float *noise_comp_d_i, int sx
     }
 }
 
-extern "C" void normalize_gpu(float2 *array, int sx, int sy)
+extern "C" void normalize_gpu(float2 *array, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     normalize_k<<<blocks, threadsPerBlock>>>(array, sx, sy);
 }
 

@@ -6,63 +6,28 @@
 
 #include "../inc/term_kernels.cuh"
 
-extern "C" void computeProduct_gpu(float2 **product, float2 *out, int prodSize, int sx, int sy)
+extern "C" void computeProduct_gpu(float2 **product, float2 *out, int prodSize, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     computeProduct_k<<<blocks, threadsPerBlock>>>(product, out, prodSize, sx, sy);
 }
 
-extern "C" void applyPrefactor_gpu(float2 *out, float pref, int q2n, int iqx, int iqy, int invq, int sx, int sy, float stepqx, float stepqy)
+extern "C" void applyPrefactor_gpu(float2 *out, float pref, int q2n, int iqx, int iqy, int invq, int sx, int sy, float stepqx, float stepqy,dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     applyPrefactors_k<<<blocks, threadsPerBlock>>>(out, pref, q2n, iqx, iqy, invq, sx, sy, stepqx, stepqy);
 }
 
-extern "C" void copyComp_gpu(float2 *out, float2 *in, int sx, int sy)
+extern "C" void copyComp_gpu(float2 *out, float2 *in, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     copyComp_k<<<blocks, threadsPerBlock>>>(out, in, sx, sy);
 }
 
-extern "C" void applyPres_vector_gpu(float2 *out, pres *prefactors, int p_len, int sx, int sy, float stepqx, float stepqy)
+extern "C" void applyPres_vector_gpu(float2 *out, pres *prefactors, int p_len, int sx, int sy, float stepqx, float stepqy,dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     applyPres_vector_k<<<blocks, threadsPerBlock>>>(out, prefactors, p_len, sx, sy, stepqx, stepqy);
 }
 
-extern "C" void applyPres_vector_pre_gpu(float2 *out, float *pres, int mult_by_i, int sx, int sy)
+extern "C" void applyPres_vector_pre_gpu(float2 *out, float *pres, int mult_by_i, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {
-    dim3 threadsPerBlock(32,32);
-    dim3 blocks(sx/32, sy/32);
-    if (sy == 1) // 1d system
-    {
-        blocks = 1;
-        threadsPerBlock = sx;
-    }
     applyPres_vector_pre_k<<<blocks, threadsPerBlock>>>(out, pres, mult_by_i, sx, sy);
 }
 

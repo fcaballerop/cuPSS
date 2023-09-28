@@ -48,7 +48,7 @@ int term::computeProduct()
     if (isCUDA)
     {
         cudaDeviceSynchronize();
-        computeProduct_gpu(product_d, term_real_d, product.size(), sx, sy);
+        computeProduct_gpu(product_d, term_real_d, product.size(), sx, sy, blocks, threads_per_block);
     }
     else 
     {
@@ -82,7 +82,7 @@ int term::copyComp()
 {
     if (isCUDA)
     {
-        copyComp_gpu(term_comp_d, product[0]->comp_array_d, sx, sy);
+        copyComp_gpu(term_comp_d, product[0]->comp_array_d, sx, sy, blocks, threads_per_block);
     }
     else 
     {
@@ -103,7 +103,7 @@ int term::applyPrefactors()
 {
     if (isCUDA)
     {
-        applyPrefactor_gpu(term_comp_d, prefactors.preFactor, prefactors.q2n, prefactors.iqx, prefactors.iqy, prefactors.invq, sx, sy, stepqx, stepqy);
+        applyPrefactor_gpu(term_comp_d, prefactors.preFactor, prefactors.q2n, prefactors.iqx, prefactors.iqy, prefactors.invq, sx, sy, stepqx, stepqy, blocks, threads_per_block);
     }
     else 
     {
@@ -181,7 +181,7 @@ int term::applyPres_vector()
     {
         // applyPres_vector_gpu(term_comp_d, prefactors_d, prefactors_h.size(), sx, sy, stepqx, stepqy);
         cudaDeviceSynchronize();
-        applyPres_vector_pre_gpu(term_comp_d, precomp_prefactor_d, multiply_by_i_pre, sx, sy);
+        applyPres_vector_pre_gpu(term_comp_d, precomp_prefactor_d, multiply_by_i_pre, sx, sy, blocks, threads_per_block);
     }
     else 
     {

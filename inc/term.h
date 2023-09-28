@@ -26,6 +26,7 @@ private:
     const float dx, dy;           // cell size
     const float stepqx, stepqy;   // smallest wavelength, 
 
+
     // fftw stuff
     fftwf_plan plan_forward, plan_backward;
 
@@ -55,6 +56,9 @@ public:
     float *precomp_prefactor_d;
 
     int multiply_by_i_pre;
+
+    dim3 threads_per_block;
+    dim3 blocks;
 
     int update();
 };
