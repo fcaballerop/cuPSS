@@ -14,8 +14,8 @@
 #include <cuda_runtime.h>
 #endif
 
-#define Nx 128
-#define Ny 128 
+#define Nx 256
+#define Ny 256 
 
 int main(int argc, char **argv)
 {
@@ -36,13 +36,13 @@ int main(int argc, char **argv)
 
     // Constants
     float eta = 1.0f;
-    float aQ = 1.0f;
-    float bQ = 1000.0f;
+    float aQ = -1.0f;
+    float bQ = 1.0f;
     float kQ = 4.0f; // K=4 is the one used in the paper
     float lambda = 0.7f;
     float friction = 0.0f;
     float gamma = 1.0f;
-    float alpha = -15.0f;
+    float alpha = -0.5f;
 
     // Implicit terms
     system.fields[6]->implicit.push_back({eta, 1, 0, 0, 0});

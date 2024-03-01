@@ -134,12 +134,9 @@ int main(int argc, char **argv)
         system.fields[i]->precalculateImplicit(system.dt);
         system.fields[i]->outputToFile = false;
     }
-    system.fields[4]->outputToFile = true;
-    system.fields[5]->outputToFile = true;
-    system.fields[6]->outputToFile = true;
     system.fields[7]->outputToFile = true;
 
-    int steps = 1000000;
+    int steps = 100000;
     int check = steps/100;
     if (check < 1) check = 1;
     

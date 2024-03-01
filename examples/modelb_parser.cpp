@@ -31,26 +31,29 @@
 #include "../inc/evolver.h"
 #include "../inc/field.h"
 #include "../inc/term.h"
+#include "../inc/parser.h"
 
 #ifdef WITHCUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
 #endif
 
-#define NX 2048
-#define NY 2048
+#define NX 128
+#define NY 128 
 
 int main(int argc, char **argv)
 {
-    evolver system(1, NX, NY, 20.0f/128.0f, 20.0f/128.0f, 0.0001f, 5000);
+    evolver system(1, NX, NY, 1.0f, 1.0f, 0.1f, 100);
 
-    system.createField("phi", true);        // 0
+    system.createField("phi", true);
 
-    // Terms for field phi
-    system.createTerm("phi", {{-1.0f, 1, 0, 0, 0}}, {"phi", "phi", "phi"});
+    system.addParameter("a", -1.0f);
+    system.addParameter("b", 1.0f);
+    system.addParameter("k", 4.0f);
 
-    system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0});
-    system.fields[0]->implicit.push_back({-1.0f, 2, 0, 0, 0});
+    system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 ");
+
+    system.printInformation();
 
     // Random initial state
     std::srand(1324);
@@ -68,10 +71,6 @@ int main(int argc, char **argv)
     cudaMemcpy(system.fields[0]->comp_array_d, system.fields[0]->comp_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
     system.fields[0]->toComp();
 
-    system.fields[0]->isNoisy = false;
-    system.fields[0]->noiseType = GaussianWhite;
-    system.fields[0]->noise_amplitude = {0.1f, 1, 0, 0, 0};
-    
     for (int i = 0; i < system.fields.size(); i++)
     {
         system.fields[i]->prepareDevice();
@@ -82,8 +81,6 @@ int main(int argc, char **argv)
     int steps = 100000;
     int check = steps/100;
     if (check < 1) check = 1;
-    
-    system.printInformation();
 
     for (int i = 0; i < steps; i++)
     {

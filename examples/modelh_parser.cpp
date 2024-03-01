@@ -31,26 +31,53 @@
 #include "../inc/evolver.h"
 #include "../inc/field.h"
 #include "../inc/term.h"
+#include "../inc/parser.h"
 
 #ifdef WITHCUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
 #endif
 
-#define NX 2048
-#define NY 2048
+#define NX 256
+#define NY 256 
 
 int main(int argc, char **argv)
 {
-    evolver system(1, NX, NY, 20.0f/128.0f, 20.0f/128.0f, 0.0001f, 5000);
+    evolver system(1, NX, NY, 1.0f, 1.0f, 0.1f, 100);
 
-    system.createField("phi", true);        // 0
+    system.createField("phi", true);
+    system.createField("iqxphi", false);
+    system.createField("iqyphi", false);
+    system.createField("sigxx", false);
+    system.createField("sigxy", false);
+    system.createField("vx", false);
+    system.createField("vy", false);
+    system.createField("w", false);
 
-    // Terms for field phi
-    system.createTerm("phi", {{-1.0f, 1, 0, 0, 0}}, {"phi", "phi", "phi"});
+    system.addParameter("a", -1.0f);
+    system.addParameter("b", 1.0f);
+    system.addParameter("k", 4.0f);
+    system.addParameter("eta", 1.0f);
+    system.addParameter("friction", 0.0f);
+    system.addParameter("ka", -4.0f);
+    system.addParameter("D", 0.01f);
 
-    system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0});
-    system.fields[0]->implicit.push_back({-1.0f, 2, 0, 0, 0});
+
+    system.fields[0]->isNoisy = true;
+    system.fields[0]->noiseType = GaussianWhite;
+    system.fields[0]->noise_amplitude = {0.01f, 1, 0, 0, 0};
+
+    system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 -vx*iqxphi - vy*iqyphi");
+    system.addEquation("iqxphi = iqx*phi");
+    system.addEquation("iqyphi = iqy*phi");
+    system.addEquation("sigxx = - 0.5*ka *iqxphi * iqxphi + 0.5*ka*iqyphi*iqyphi");
+    system.addEquation("sigxy = - ka *iqxphi * iqyphi");
+
+    system.addEquation("vx * (friction + eta*q^2) = (iqx + iqx^3*1/q^2 - iqx*iqy^2*1/q^2) * sigxx + (iqy + iqx^2* iqy*1/q^2 + iqx^2*iqy*1/q^2) * sigxy");
+    system.addEquation("vy * (friction + eta*q^2) = (iqx + iqx*iqy^2*1/q^2 + iqx*iqy^2*1/q^2) * sigxy + (-iqy - iqy^3*1/q^2 + iqx^2*iqy*1/q^2) * sigxx");
+    system.addEquation("w = 0.5*iqx * vy - 0.5*iqy*vx ");
+
+    system.printInformation();
 
     // Random initial state
     std::srand(1324);
@@ -68,22 +95,17 @@ int main(int argc, char **argv)
     cudaMemcpy(system.fields[0]->comp_array_d, system.fields[0]->comp_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
     system.fields[0]->toComp();
 
-    system.fields[0]->isNoisy = false;
-    system.fields[0]->noiseType = GaussianWhite;
-    system.fields[0]->noise_amplitude = {0.1f, 1, 0, 0, 0};
-    
     for (int i = 0; i < system.fields.size(); i++)
     {
         system.fields[i]->prepareDevice();
         system.fields[i]->precalculateImplicit(system.dt);
+        system.fields[i]->outputToFile = false;
     }
     system.fields[0]->outputToFile = true;
 
     int steps = 100000;
     int check = steps/100;
     if (check < 1) check = 1;
-    
-    system.printInformation();
 
     for (int i = 0; i < steps; i++)
     {

@@ -10,6 +10,7 @@
 #include "../inc/evolver.h"
 #include "../inc/field.h"
 #include "../inc/term.h"
+#include "../inc/parser.h"
 
 evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float _dt, int _ses) : sx(_sx), sy(_sy), dx(_dx), dy(_dy), dt(_dt), writeEveryNSteps(_ses)
 {
@@ -41,6 +42,20 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
         threads_per_block = dim3(32,32);
         blocks = dim3(sx/32,sy/32);
     }
+
+    _parser = new parser("NONE", this);
+}
+
+int evolver::addParameter(std::string _name, float value)
+{
+    _parser->insert_parameter(_name, value);
+    return 0;
+}
+
+int evolver::addEquation(std::string equation)
+{
+    _parser->add_equation(equation);
+    return 0;
 }
 
 void evolver::addField(field *newField)

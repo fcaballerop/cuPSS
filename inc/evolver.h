@@ -7,6 +7,7 @@
 #include "defines.h"
 
 class field;
+class parser;
 
 struct pres;
 
@@ -16,6 +17,7 @@ private:
     const int sx, sy;
     const float dx, dy;
     const int writeEveryNSteps;
+    parser *_parser;
 public:
     dim3 threads_per_block;
     dim3 blocks;
@@ -28,6 +30,9 @@ public:
     int createField(std::string, bool);
     // int createTerm(std::string, pres, const std::vector<std::string> &);
     int createTerm(std::string, const std::vector<pres> &, const std::vector<std::string> &);
+
+    int addParameter(std::string, float);
+    int addEquation(std::string);
 
     // Global variables
     bool with_cuda;
