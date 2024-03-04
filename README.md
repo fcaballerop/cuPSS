@@ -73,6 +73,7 @@ where $L(k)$ can be a constant or a power of wavelength $k$, allowing for severa
 ## What it does not support (yet)
 
  - Correlated noise.
+ - 3D systems
  - Update rules other than Euler stepping (RK2, RK4, etc).
  - Compilable without CUDA so that it can run only on CPU.
  - More general functions of wavelength as prefactors, like generic powers.
