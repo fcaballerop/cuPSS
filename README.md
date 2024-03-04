@@ -38,8 +38,9 @@ cd src/
 nvcc -c *cpp -DWITHCUDA -O2
 nvcc -c *cu -DWITHCUDA -O2
 ar rcs libcupss.a *o
+cd ../
 ```
-This will create a file `libcupss.a` which can the be linked to any particular solver.
+This will create a file `src/libcupss.a` which can the be linked to any particular solver.
 
 A number of example solvers can be found in the `examples` directory. They can be compiled by compiling with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
 ```
