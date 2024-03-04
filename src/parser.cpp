@@ -75,7 +75,9 @@ int parser::is_number(const std::string &term)
     int has_period = 0;
     int period_ind = 0;
     std::string to_test = term;
-    for (int i = 0; i < term.size(); i++)
+    if (term.substr(0,2) == "1/")
+        to_test.erase(0,2);
+    for (int i = 0; i < to_test.size(); i++)
     {
         if (to_test[i] == '.')
         {
@@ -105,10 +107,32 @@ float parser::is_numerical_factor(const std::string &factor)
     if (is_iq_factor(factor, "iqy")) return 1.0f;
     if (is_iq_factor(factor, "1/q")) return 1.0f;
     if (is_field(factor)) return 1.0f;
-    if (exists_parameter(factor))
-        return parameters[factor];
-    else if (is_number(factor))
-        return std::stof(factor);
+
+    int divides = 0;
+    std::string _factor;
+    if (factor.substr(0,2) == "1/")
+    {
+        divides = 1;
+        _factor = factor.substr(2);
+    }
+    else
+        _factor = factor;
+
+
+    if (exists_parameter(_factor))
+    {
+        if (divides)
+            return 1.0f/parameters[_factor];
+        else
+            return parameters[_factor];
+    }
+    else if (is_number(_factor))
+    {
+        if (divides)
+            return 1.0f/std::stof(_factor);
+        else
+            return std::stof(_factor);
+    }
     else
     {
         std::cout << "ERROR, parameter not found and not a number: " << factor << std::endl;
