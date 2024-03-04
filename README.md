@@ -26,28 +26,29 @@ Detailed information about how to code a solver using this library can be found 
  * cuRAND
  * FFTW3
 
-## Compiling a solver
-A number of example solvers can be found in the `examples` directory. They can be compiled by compiling them together with the source files found in the directory `src`, for instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
+## Quickstart
 
+To run the cuPSS examples, first clone the repository
 ```
-nvcc -O2 examples/modelb.cpp src/field_init.cpp src/field.cpp src/term_init.cpp src/term.cpp src/evolver.cpp src/field_kernels.cu src/term_kernels.cu -lcufft -lfftw3f -lcurand -DWITHCUDA -o modelb
+git clone https://github.com/fcaballerop/cuPSS.git
 ```
-
-Alternatively, the source files can be compiled into a library to then link to each solver. To do so, we can run the following once:
+Then compile the library, (check dependencies above if any errors come up during compilation)
 ```
 cd src/
 nvcc -c *cpp -DWITHCUDA -O2
 nvcc -c *cu -DWITHCUDA -O2
 ar rcs libcupss.a *o
 ```
+This will create a file `libcupss.a` which can the be linked to any particular solver.
 
-This will create a static library called cupss in the file `libcupss.a`. To compile a solver, we can then simply compile it linking it to this library:
+A number of example solvers can be found in the `examples` directory. They can be compiled by compiling with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
 ```
 nvcc examples/modelb.cpp -Lsrc/ -lcufft -lfftw3f -lcurand -lcupss -O2 -o modelb
 ```
 
-And then run it
+The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located. It will be in `src/` if the library has been compiled with the lines above. The solver can be run by
 ```
+mkdir data
 ./modelb
 ```
 The solver outputs data by default to a directory called `data` from where it's called. The output files contain raw data of the states of the field at each timestep at which they're written out.
