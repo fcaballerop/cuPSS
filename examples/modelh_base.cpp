@@ -63,7 +63,6 @@ int main(int argc, char **argv)
     system.addParameter("ka", -4.0f);
     system.addParameter("D", 0.01f);
 
-
     system.fields[0]->isNoisy = true;
     system.fields[0]->noiseType = GaussianWhite;
     system.fields[0]->noise_amplitude = {0.01f, 1, 0, 0, 0};
@@ -90,23 +89,13 @@ int main(int argc, char **argv)
         {
             int index = j * NX + i;
             system.fields[0]->real_array[index].x = -0.0f + 0.001f * (float)(rand()%200-100);
-            system.fields[0]->real_array[index].y = 0.0f;
         }
     }
 
-    cudaMemcpy(system.fields[0]->real_array_d, system.fields[0]->real_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    cudaMemcpy(system.fields[0]->comp_array_d, system.fields[0]->comp_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    system.fields[0]->toComp();
+    system.prepareProblem();
+    system.setOutputField("phi", 1);
 
-    for (int i = 0; i < system.fields.size(); i++)
-    {
-        system.fields[i]->prepareDevice();
-        system.fields[i]->precalculateImplicit(system.dt);
-        system.fields[i]->outputToFile = false;
-    }
-    system.fields[0]->outputToFile = true;
-
-    int steps = 100000;
+    int steps = 2000;
     int check = steps/100;
     if (check < 1) check = 1;
 

@@ -46,6 +46,40 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
     _parser = new parser("NONE", this);
 }
 
+void evolver::prepareProblem()
+{
+    // copy host to device to account for initial conditions
+    for (int i = 0; i < fields.size(); i++)
+    {
+        cudaMemcpy(fields[i]->real_array_d, fields[i]->real_array, sx*sy*sizeof(float2), cudaMemcpyHostToDevice);
+        cudaMemcpy(fields[i]->comp_array_d, fields[i]->comp_array, sx*sy*sizeof(float2), cudaMemcpyHostToDevice);
+        fields[i]->toComp();
+    }
+    // for each field prepare device and precalculate implicits
+    for (int i = 0; i < fields.size(); i++)
+    {
+        fields[i]->prepareDevice();
+        fields[i]->precalculateImplicit(dt);
+        fields[i]->outputToFile = false;
+    }
+}
+
+void evolver::setOutputField(std::string _name, int _output)
+{
+    for (int i = 0; i < fields.size(); i++)
+    {
+        if (fields[i]->name == _name)
+        {
+            if (_output)
+                fields[i]->outputToFile = true;
+            else
+                fields[i]->outputToFile = false;
+            return;
+        }
+    }
+    std::cout << "setOutputField EROR: " << _name << " not found." << std::endl;
+}
+
 int evolver::addParameter(std::string _name, float value)
 {
     _parser->insert_parameter(_name, value);

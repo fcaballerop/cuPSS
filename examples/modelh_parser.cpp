@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     }
     system.fields[0]->outputToFile = true;
 
-    int steps = 100000;
+    int steps = 2000;
     int check = steps/100;
     if (check < 1) check = 1;
 

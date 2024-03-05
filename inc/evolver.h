@@ -49,6 +49,10 @@ public:
     void printInformation();
 
     void copyAllDataToHost();
+
+    void prepareProblem();
+
+    void setOutputField(std::string, int);
 };
 
 #endif // EVOLVER_H
