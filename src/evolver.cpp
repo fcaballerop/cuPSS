@@ -7,6 +7,7 @@
 #include <ostream>
 #include <string>
 #include <cuda_runtime.h>
+#include <filesystem>
 #include "../inc/evolver.h"
 #include "../inc/field.h"
 #include "../inc/term.h"
@@ -48,6 +49,21 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
 
 void evolver::prepareProblem()
 {
+    bool created_data_dir = false;
+    bool create_dir_exception = false;
+    try 
+    {
+        created_data_dir = std::filesystem::create_directory("data");
+    }
+    catch(std::exception &e)
+    {
+        create_dir_exception = true;
+        std::cout << "ERROR CREATING DATA DIRECTORY, is there a file called 'data'?" << std::endl;
+    }
+    if ((not created_data_dir) && (!create_dir_exception))
+    {
+        //data dir already exists.
+    }
     // copy host to device to account for initial conditions
     for (int i = 0; i < fields.size(); i++)
     {
