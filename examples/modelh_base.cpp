@@ -27,11 +27,7 @@
 #include <driver_types.h>
 #include <iostream>
 #include <ostream>
-#include "../inc/defines.h"
-#include "../inc/evolver.h"
-#include "../inc/field.h"
-#include "../inc/term.h"
-#include "../inc/parser.h"
+#include "../inc/cupss.h"
 
 #ifdef WITHCUDA
 #include <cuda.h>
