@@ -1,15 +1,105 @@
 #include "../inc/parser.h"
 #include "../inc/evolver.h"
 #include "../inc/field.h"
+#include <sstream>
+#include <fstream>
 
 
-parser::parser(const std::string &_file_name, evolver *_system)
+parser::parser(evolver *_system)
 {
-    file_name = _file_name;
     system = _system;
     verbose = 0;
 }
 
+int parser::createFromFile(const std::string &_file_name)
+{
+    std::string line;
+    std::cout << "Trying to read system from " << _file_name << std::endl;
+    std::ifstream infile(_file_name);
+    int read_type = -1; // 0 fields, 1 parameters, 2 equations
+    std::vector<std::string> equation_vector;
+    while (std::getline(infile, line))
+    {
+        std::cout << line << std::endl;
+        std::istringstream iss(line);
+        if (line == "" || line.substr(0,0) == "#")
+            continue;
+        if (read_type == -1)
+        {
+            // must read a type
+            if (line.substr(0,6) == "Fields" || line.substr(0,6) == "fields")
+                read_type = 0;
+            else if (line.substr(0,6) == "Parameters" || line.substr(0,6) == "parameters")
+                read_type = 1;
+            else if (line.substr(0,6) == "Equations" || line.substr(0,6) == "Equations")
+                read_type = 2;
+            else
+            {
+                std::cout << "ERROR: reading file " << _file_name << std::endl;
+                std::cout << "First line must be either fields, parameters, or equations, it is:" << std::endl;
+                std::cout << line << std::endl;
+                return -1;
+            }
+            continue;
+        }
+        if (line.substr(0,6) == "Fields" || line.substr(0,6) == "fields")
+        {
+            read_type = 0;
+            continue;
+        }
+        else if (line.substr(0,10) == "Parameters" || line.substr(0,10) == "parameters")
+        {
+            read_type = 1;
+            continue;
+        }
+        else if (line.substr(0,9) == "Equations" || line.substr(0,9) == "Equations")
+        {
+            read_type = 2;
+            continue;
+        }
+        else
+        {
+            if (read_type == 0)
+            {
+                std::string field_name;
+                int dynamic;
+                int output;
+                if (!(iss >> field_name >> dynamic >> output))
+                {
+                    std::cout << "Error reading field line: " << line << std::endl;
+                    std::cout << "Must be: field_name dynamic_value output" << std::endl;
+                    return -1;
+                }
+                std::cout << "Creating field: " << field_name << ", dynamic: " << dynamic << std::endl;
+                system->createField(field_name, dynamic);
+                system->setOutputField(field_name, output);
+            }
+            if (read_type == 1)
+            {
+                std::string param_name;
+                float value;
+                if (!(iss >> param_name >> value))
+                {
+                    std::cout << "Error reading parameter line: " << line << std::endl;
+                    std::cout << "Must be: param_name value" << std::endl;
+                    return -1;
+                }
+                std::cout << "Creating parameter: " << param_name << " = " << value << std::endl;
+                insert_parameter(param_name, value);
+            }
+            if (read_type == 2)
+            {
+                std::string param_name;
+                equation_vector.push_back(line);
+            }
+        }
+    }
+    for (int i = 0; i < equation_vector.size(); i++)
+    {
+        add_equation(equation_vector[i]);
+    }
+    return 0;
+}
 
 int parser::insert_parameter(const std::string & p_name, float value)
 {

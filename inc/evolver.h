@@ -33,6 +33,7 @@ public:
 
     int addParameter(std::string, float);
     int addEquation(std::string);
+    int createFromFile(const std::string &);
 
     // Global variables
     bool with_cuda;

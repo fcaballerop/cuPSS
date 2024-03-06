@@ -44,9 +44,15 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
         blocks = dim3(sx/32,sy/32);
     }
 
-    _parser = new parser("NONE", this);
+    _parser = new parser(this);
 }
 
+
+int evolver::createFromFile(const std::string &file)
+{
+    _parser->createFromFile(file);
+    return 0;
+}
 void evolver::prepareProblem()
 {
     bool created_data_dir = false;
@@ -76,7 +82,6 @@ void evolver::prepareProblem()
     {
         fields[i]->prepareDevice();
         fields[i]->precalculateImplicit(dt);
-        fields[i]->outputToFile = false;
     }
 }
 

@@ -9,7 +9,6 @@ class parser
 {
     private:
         int populate_system();
-        std::string file_name;
         evolver *system;
         std::map<std::string, float> parameters;
         std::vector<char> token_split_char = {'+', '-', '='};
@@ -25,7 +24,8 @@ class parser
         void get_par_terms(const std::string &, std::vector<std::string> &);
 
     public:
-        parser(const std::string &, evolver *system);
+        int createFromFile(const std::string &);
+        parser(evolver *system);
         int add_equation(const std::string &);
         int insert_parameter(const std::string &, float);
         int exists_parameter(const std::string &);
