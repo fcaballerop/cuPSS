@@ -12,6 +12,7 @@ class parser
         evolver *system;
         std::map<std::string, float> parameters;
         std::vector<char> token_split_char = {'+', '-', '='};
+        std::vector<char> factor_split_char = {'*', '/'};
         float is_numerical_factor(const std::string &);
         int is_q2n_factor(const std::string &);
         int is_iq_factor(const std::string &, const std::string &);

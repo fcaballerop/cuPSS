@@ -178,13 +178,6 @@ void field::stepEuler(float dt)
                 comp_array[index].x += dt * terms[term]->term_comp[index].x;
                 comp_array[index].y += dt * terms[term]->term_comp[index].y;
             }
-            if (isNoisy)
-            {
-                comp_array[index].x += precomp_noise[index] * noise_comp[index].x;
-                comp_array[index].y += precomp_noise[index] * noise_comp[index].y;
-                // std::cout << "Added " << noise_comp[index].x << " " << noise_comp[index].y << std::endl;
-                // std::cout << "Over " << comp_array[index].x << " " << comp_array[index].y << std::endl;
-            }
             // After adding all explicit terms, we divide over the implicits
             if (implicit.size() > 0)
             {
@@ -211,6 +204,11 @@ void field::stepEuler(float dt)
                 // comp_array[index].y /= implicitFactor;
                 comp_array[index].x /= precomp_implicit[index];
                 comp_array[index].y /= precomp_implicit[index];
+            }
+            if (isNoisy)
+            {
+                comp_array[index].x += precomp_noise[index] * noise_comp[index].x;
+                comp_array[index].y += precomp_noise[index] * noise_comp[index].y;
             }
         }
     }

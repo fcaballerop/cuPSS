@@ -26,6 +26,10 @@ public:
     std::vector<field*> fields;
     evolver(bool, int, int, float, float, float, int);
 
+    std::map<std::string, field *> fieldsMap;
+    std::map<std::string, float2 *> fieldsReal;
+    std::map<std::string, float2 *> fieldsFourier;
+
     void addField(field *);
     int createField(std::string, bool);
     // int createTerm(std::string, pres, const std::vector<std::string> &);

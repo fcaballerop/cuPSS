@@ -185,12 +185,6 @@ __global__ void setDynamic_k(float2 **terms, int len, pres *implicits, int i_len
             out[index].x += dt * terms[t][index].x;
             out[index].y += dt * terms[t][index].y;
         }
-        if (isNoisy)
-        {
-            // includes sqrt(dt) in the precomp_noise
-            out[index].x += precomp_noise[index] * noise[index].x;
-            out[index].y += precomp_noise[index] * noise[index].y;
-        }
         // Now implicit terms
         if (i_len > 0)
         {
@@ -217,6 +211,12 @@ __global__ void setDynamic_k(float2 **terms, int len, pres *implicits, int i_len
             // out[index].y /= implicitFactor;
             out[index].x /= precomp[index];
             out[index].y /= precomp[index];
+        }
+        if (isNoisy)
+        {
+            // includes sqrt(dt) in the precomp_noise
+            out[index].x += precomp_noise[index] * noise[index].x;
+            out[index].y += precomp_noise[index] * noise[index].y;
         }
     }
 }

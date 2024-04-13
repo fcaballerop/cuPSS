@@ -41,7 +41,11 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
     else 
     {
         threads_per_block = dim3(32,32);
-        blocks = dim3(sx/32,sy/32);
+        int bx = (sx+31)/32;
+        int by = (sy+31)/32;
+        // blocks = dim3(sx/32,sy/32);
+        blocks = dim3(bx,by);
+        std::cout << bx << " " << by << std::endl;
     }
 
     _parser = new parser(this);
@@ -53,6 +57,7 @@ int evolver::createFromFile(const std::string &file)
     _parser->createFromFile(file);
     return 0;
 }
+
 void evolver::prepareProblem()
 {
     bool created_data_dir = false;
@@ -135,6 +140,10 @@ int evolver::createField(std::string name, bool dynamic)
     newField->blocks = blocks;
     newField->threads_per_block = threads_per_block;
     fields.push_back(newField);
+
+    fieldsMap[name] = fields[fields.size()-1];
+    fieldsReal[name] = fields[fields.size()-1]->real_array;
+    fieldsFourier[name] = fields[fields.size()-1]->comp_array;
     return 0;
 }
 
