@@ -37,7 +37,7 @@ __global__ void copyComp_k(float2 *out, float2 *in, int sx, int sy)
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx*sy)
+    if (i < sx && j < sy)
     {
         out[index].x = in[index].x;
         out[index].y = in[index].y;
@@ -50,7 +50,7 @@ __global__ void computeProduct_k(float2 **product, float2 *out, int prodSize, in
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx*sy)
+    if (i < sx && j < sy)
     {
         int c;
         float result = 1.0f;
@@ -70,7 +70,7 @@ __global__ void applyPrefactors_k(float2 *out, float pref, int q2n, int iqx, int
 
     int index = j * sx + i;
 
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         out[index].x *= pref;
         out[index].y *= pref;
@@ -135,7 +135,7 @@ __global__ void applyPres_vector_k(float2 *out, pres *prefactors, int p_len, int
 
     int index = j * sx + i;
 
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         float totalPrefactor = 0.0f;
         int multiply_by_i = (prefactors[0].iqx + prefactors[0].iqy)%2;
@@ -195,7 +195,7 @@ __global__ void applyPres_vector_pre_k(float2 *out, float *pres, int mult_by_i, 
 
     int index = j * sx + i;
 
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         out[index].x *= pres[index];
         out[index].y *= pres[index];

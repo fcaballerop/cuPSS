@@ -42,7 +42,7 @@ __global__ void correctNoiseAmplitude_k(float2 *noise_fourier, float *precomp_no
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         noise_fourier[index].x *= precomp_noise_d[index];
         noise_fourier[index].y *= precomp_noise_d[index];
@@ -55,7 +55,7 @@ __global__ void copyToFloat2_k(float *in, float2 *out, int sx, int sy)
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         out[index].x = in[index];
         out[index].y = 0.0f;
@@ -68,7 +68,7 @@ __global__ void createNoise_k(float *noise_comp_d_r, float *noise_comp_d_i, int 
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         noise_comp_d_r[index] *= amplitude[index];
         noise_comp_d_i[index] *= amplitude[index];
@@ -81,7 +81,7 @@ __global__ void conjNoise_k(float *noise_comp_d_r, float *noise_comp_d_i, int sx
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         if (i >= sx/2 || j >= sy/2)
         {
@@ -110,7 +110,7 @@ __global__ void normalize_k(float2 *array, int sx, int sy)
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         float normalization = 1.0f / ((float)(sx*sy));
         array[index].x *= normalization;
@@ -124,7 +124,7 @@ __global__ void setNotDynamic_k(float2 **terms, int len, pres *implicits, int i_
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         int t = 0;
         for (t = 0; t < len; t++)
@@ -177,7 +177,7 @@ __global__ void setDynamic_k(float2 **terms, int len, pres *implicits, int i_len
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         int t = 0;
         for (t = 0; t < len; t++)
@@ -227,7 +227,7 @@ __global__ void dealias_k(float2 *comp_array_d, float2 *comp_dealiased_d, int sx
     int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index = j * sx + i;
-    if (index < sx * sy)
+    if (i < sx && j < sy)
     {
         int n_i = i;
         int n_j = j;
