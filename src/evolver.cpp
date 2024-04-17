@@ -45,7 +45,6 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float 
         int by = (sy+31)/32;
         // blocks = dim3(sx/32,sy/32);
         blocks = dim3(bx,by);
-        std::cout << bx << " " << by << std::endl;
     }
 
     _parser = new parser(this);
@@ -195,6 +194,13 @@ void evolver::writeOut()
     if (with_cuda)
     {
         copyAllDataToHost();
+    }
+    // check for NaNs (not checked if no output)
+    float c1 = fields[0]->real_array[0].x;
+    if (c1 != c1)
+    {
+        std::cout << "NaN detected, exiting!" << std::endl;
+        std::exit(-1);
     }
     for (int k = 0; k < fields.size(); k++)
     {
