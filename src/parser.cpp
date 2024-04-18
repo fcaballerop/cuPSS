@@ -420,6 +420,33 @@ void parser::get_par_terms(const std::string &_term, std::vector<std::string> &f
     return;
 }
 
+pres parser::add_noise(const std::string &_equation)
+{
+    std::string equation = _equation;
+    for (int i = 0; i < equation.size(); i++)
+    {
+        if (equation[i] == ' ')
+        {
+            equation.erase(i,1);
+            i--;
+        }
+    }
+
+    std::vector<std::string> factors;
+    get_factors(equation, factors);
+
+    pres prefactor = {1.0f, 0, 0, 0, 0};
+
+    for (int i = 0; i < factors.size(); i++)
+    {
+        prefactor.preFactor *= is_numerical_factor(factors[i]);
+        prefactor.q2n += is_q2n_factor(factors[i])/2;
+        prefactor.invq += is_iq_factor(factors[i], "1/q");
+    }
+
+    return prefactor;
+}
+
 int parser::add_equation(const std::string &_equation)
 {
     std::string equation = _equation;
@@ -490,6 +517,10 @@ int parser::add_equation(const std::string &_equation)
     }
 
     // Find which field we're creating an equation for
+    if (lhs_terms[0] == "")
+    {   
+        lhs_terms.erase(lhs_terms.begin());
+    }
     if (lhs_terms[0].substr(0,2) == "dt")
     {
         dynamic = 1;
@@ -500,8 +531,8 @@ int parser::add_equation(const std::string &_equation)
     {
         if (number_of_fields(lhs_terms[0]) != 1)
         {
-            std::cout << "ERROR: Nonlinear term in left hand side" << std::endl;
-            std::cout << lhs_terms[0] << std::endl;
+            std::cout << "ERROR: Nonlinear term in left hand side: " << number_of_fields(lhs_terms[1]) << std::endl;
+            std::cout << lhs_terms[1] << std::endl;
             return -1;
         }
         field_name = get_field_name(lhs_terms[0]);

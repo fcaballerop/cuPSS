@@ -37,7 +37,10 @@ public:
 
     int addParameter(std::string, float);
     int addEquation(std::string);
+    int addNoise(std::string, std::string);
     int createFromFile(const std::string &);
+
+    int existsField(std::string);
 
     // Global variables
     bool with_cuda;

@@ -1,32 +1,11 @@
-/* Short explanation on the way to add fields and terms in this file
- *
- * evolver is a class that merely calls updates on all fields and terms
- * the arguments on its constructor are 
- *
- *      evolver system(x,           sx,             sy,             dx,       dy,       dt);
- *                     Use CUDA | x-system size | y-system size | delta_x | delta_y | delta_t
- *
- * To this evolver we can add fields:
- *
- *      system.createField( name, dynamic );
- *
- * name is a string and dynamic if a boolean that sets whether the field
- * is set in each step through a time derivative or through an equality.
- *
- * To each field we can add terms
- *      
- *      system.createTerm(  field_name, prefactor, {field_1, ..., field_n}  );
- *
- *  This term would be a term of "field_name", with that prefactor, that multiplies
- *  fields field_1 to field_n.
- */ 
-
 #include <cmath>
 #include <cstdlib>
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
 #include <iostream>
 #include <ostream>
+#include <chrono>
+#include <ctime>
 #include "../inc/cupss.h"
 
 #ifdef WITHCUDA
@@ -36,6 +15,7 @@
 
 #define NX 256
 #define NY 256 
+#define NSTEPS 10000
 
 int main(int argc, char **argv)
 {
@@ -59,17 +39,13 @@ int main(int argc, char **argv)
     system.addParameter("ka", -4.0f);
     system.addParameter("D", 0.01f);
 
-    system.fields[0]->isNoisy = true;
-    system.fields[0]->noiseType = GaussianWhite;
-    system.fields[0]->noise_amplitude = {0.01f, 1, 0, 0, 0};
-
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 -vx*iqxphi - vy*iqyphi");
     system.addEquation("iqxphi = iqx*phi");
     system.addEquation("iqyphi = iqy*phi");
     system.addEquation("sigxx = - 0.5*ka *iqxphi * iqxphi + 0.5*ka*iqyphi*iqyphi");
     system.addEquation("sigxy = - ka *iqxphi * iqyphi");
 
-    system.addEquation("P*(-q^2) = (iqx*iqx-iqy*iqy)*sigxx + 2.0 * iqx*iqy*sigxy");
+    system.addEquation("-q^2*P = (iqx*iqx-iqy*iqy)*sigxx + 2.0 * iqx*iqy*sigxy");
 
     system.addEquation("vx * (friction + eta*q^2) = -iqx*P + iqx*sigxx + iqy*sigxy");
     system.addEquation("vy * (friction + eta*q^2) = -iqy*P + iqx*sigxy - iqy*sigxx");
@@ -84,17 +60,18 @@ int main(int argc, char **argv)
         for (int i = 0; i < NX; i++)
         {
             int index = j * NX + i;
-            system.fields[0]->real_array[index].x = -0.0f + 0.001f * (float)(rand()%200-100);
+            system.fieldsReal["phi"][index].x = 0.001f * (float)(rand()%200-100);
         }
     }
 
     system.prepareProblem();
+
     system.setOutputField("phi", 1);
 
-    int steps = 2000;
+    int steps = NSTEPS;
     int check = steps/100;
     if (check < 1) check = 1;
-
+    auto start = std::chrono::system_clock::now();
     for (int i = 0; i < steps; i++)
     {
         system.advanceTime();
@@ -105,5 +82,13 @@ int main(int argc, char **argv)
         }
     }
 
+    auto end = std::chrono::system_clock::now();
+ 
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+ 
+    std::cout << "finished computation at " << std::ctime(&end_time)
+              << "elapsed time: " << elapsed_seconds.count() << "s"
+              << std::endl;
     return 0;
 }

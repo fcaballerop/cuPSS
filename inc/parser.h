@@ -28,6 +28,7 @@ class parser
         int createFromFile(const std::string &);
         parser(evolver *system);
         int add_equation(const std::string &);
+        pres add_noise(const std::string &);
         int insert_parameter(const std::string &, float);
         int exists_parameter(const std::string &);
         int is_split_character(char);

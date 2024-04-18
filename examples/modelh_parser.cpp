@@ -1,45 +1,21 @@
-/* Short explanation on the way to add fields and terms in this file
- *
- * evolver is a class that merely calls updates on all fields and terms
- * the arguments on its constructor are 
- *
- *      evolver system(x,           sx,             sy,             dx,       dy,       dt);
- *                     Use CUDA | x-system size | y-system size | delta_x | delta_y | delta_t
- *
- * To this evolver we can add fields:
- *
- *      system.createField( name, dynamic );
- *
- * name is a string and dynamic if a boolean that sets whether the field
- * is set in each step through a time derivative or through an equality.
- *
- * To each field we can add terms
- *      
- *      system.createTerm(  field_name, prefactor, {field_1, ..., field_n}  );
- *
- *  This term would be a term of "field_name", with that prefactor, that multiplies
- *  fields field_1 to field_n.
- */ 
-
 #include <cmath>
 #include <cstdlib>
 #include <cuda_runtime_api.h>
 #include <driver_types.h>
 #include <iostream>
 #include <ostream>
-#include "../inc/defines.h"
-#include "../inc/evolver.h"
-#include "../inc/field.h"
-#include "../inc/term.h"
-#include "../inc/parser.h"
+#include <chrono>
+#include <ctime>
+#include "../inc/cupss.h"
 
 #ifdef WITHCUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
 #endif
 
-#define NX 256
-#define NY 256 
+#define NX 128
+#define NY 128 
+#define NSTEPS 10000
 
 int main(int argc, char **argv)
 {
@@ -62,11 +38,6 @@ int main(int argc, char **argv)
     system.addParameter("ka", -4.0f);
     system.addParameter("D", 0.01f);
 
-
-    system.fields[0]->isNoisy = true;
-    system.fields[0]->noiseType = GaussianWhite;
-    system.fields[0]->noise_amplitude = {0.01f, 1, 0, 0, 0};
-
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 -vx*iqxphi - vy*iqyphi");
     system.addEquation("iqxphi = iqx*phi");
     system.addEquation("iqyphi = iqy*phi");
@@ -86,24 +57,14 @@ int main(int argc, char **argv)
         for (int i = 0; i < NX; i++)
         {
             int index = j * NX + i;
-            system.fields[0]->real_array[index].x = -0.0f + 0.001f * (float)(rand()%200-100);
-            system.fields[0]->real_array[index].y = 0.0f;
+            system.fieldsReal["phi"][index].x = 0.001f * (float)(rand()%200-100);
         }
     }
 
-    cudaMemcpy(system.fields[0]->real_array_d, system.fields[0]->real_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    cudaMemcpy(system.fields[0]->comp_array_d, system.fields[0]->comp_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    system.fields[0]->toComp();
+    system.prepareProblem();
+    system.fieldsMap["phi"]->outputToFile = true;
 
-    for (int i = 0; i < system.fields.size(); i++)
-    {
-        system.fields[i]->prepareDevice();
-        system.fields[i]->precalculateImplicit(system.dt);
-        system.fields[i]->outputToFile = false;
-    }
-    system.fields[0]->outputToFile = true;
-
-    int steps = 2000;
+    int steps = NSTEPS;
     int check = steps/100;
     if (check < 1) check = 1;
 
@@ -116,6 +77,6 @@ int main(int argc, char **argv)
             std::cout.flush();
         }
     }
-
+ 
     return 0;
 }

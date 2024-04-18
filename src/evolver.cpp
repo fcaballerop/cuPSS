@@ -117,6 +117,33 @@ int evolver::addEquation(std::string equation)
     return 0;
 }
 
+int evolver::existsField(std::string _name)
+{
+    int foundIndex = -1;
+    for (int i = 0; i < fields.size(); i++)
+    {
+        if (fields[i]->name == _name)
+        {
+            foundIndex = i;
+            return foundIndex;
+        }
+    }
+    return foundIndex;
+}
+
+int evolver::addNoise(std::string _name, std::string equation)
+{
+    if (existsField(_name) == -1)
+    {
+        std::cout << "Adding noise to non existing field! (" << _name << ")" << std::endl;
+        return -1;
+    }
+    pres prefactor = _parser->add_noise(equation);
+    fieldsMap[_name]->isNoisy = true;
+    fieldsMap[_name]->noise_amplitude = prefactor;
+    return 0;
+}
+
 void evolver::addField(field *newField)
 {
     fields.push_back(newField);
@@ -267,6 +294,7 @@ void evolver::printInformation()
             for (int j = 0; j < fields[i]->implicit.size(); j++)
             {
                 float pre = fields[i]->implicit[j].preFactor;
+                if (pre > 0.0f) implicitLine += "+";
                 implicitLine += std::to_string(pre);
                 if (fields[i]->implicit[j].iqx != 0)
                     implicitLine += "(iqx)^(" + std::to_string(fields[i]->implicit[j].iqx) + ")";
@@ -312,7 +340,11 @@ void evolver::printInformation()
         }
         if (fields[i]->isNoisy)
         {
-            std::cout << "+ sqrt[2" << fields[i]->noise_amplitude.preFactor;
+            std::cout << "+ sqrt[2*" << fields[i]->noise_amplitude.preFactor;
+            if (fields[i]->noise_amplitude.q2n != 0)
+                std::cout << "*q^" << fields[i]->noise_amplitude.q2n * 2;
+            if (fields[i]->noise_amplitude.invq != 0)
+                std::cout << "*1/|q|^" << fields[i]->noise_amplitude.q2n;
             // print amplitude function
             std::cout << "] x noise";
         }
