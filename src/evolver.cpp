@@ -113,7 +113,7 @@ int evolver::addParameter(std::string _name, float value)
 
 int evolver::addEquation(std::string equation)
 {
-    _parser->add_equation(equation);
+    _parser->add_equation2(equation);
     return 0;
 }
 
