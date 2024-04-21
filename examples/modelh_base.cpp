@@ -1,11 +1,4 @@
-#include <cmath>
-#include <cstdlib>
-#include <cuda_runtime_api.h>
-#include <driver_types.h>
 #include <iostream>
-#include <ostream>
-#include <chrono>
-#include <ctime>
 #include "../inc/cupss.h"
 
 #ifdef WITHCUDA
@@ -36,8 +29,7 @@ int main(int argc, char **argv)
     system.addParameter("k", 4.0f);
     system.addParameter("eta", 1.0f);
     system.addParameter("friction", 0.0f);
-    system.addParameter("ka", -4.0f);
-    system.addParameter("D", 0.01f);
+    system.addParameter("ka", 4.0f);
 
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 -vx*iqxphi - vy*iqyphi");
     system.addEquation("iqxphi = iqx*phi");
@@ -50,8 +42,6 @@ int main(int argc, char **argv)
     system.addEquation("vx * (friction + eta*q^2) = -iqx*P + iqx*sigxx + iqy*sigxy");
     system.addEquation("vy * (friction + eta*q^2) = -iqy*P + iqx*sigxy - iqy*sigxx");
     system.addEquation("w = 0.5*iqx * vy - 0.5*iqy*vx ");
-
-    system.printInformation();
 
     // Random initial state
     std::srand(1324);
@@ -71,7 +61,6 @@ int main(int argc, char **argv)
     int steps = NSTEPS;
     int check = steps/100;
     if (check < 1) check = 1;
-    auto start = std::chrono::system_clock::now();
     for (int i = 0; i < steps; i++)
     {
         system.advanceTime();
@@ -82,13 +71,5 @@ int main(int argc, char **argv)
         }
     }
 
-    auto end = std::chrono::system_clock::now();
- 
-    std::chrono::duration<double> elapsed_seconds = end-start;
-    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
- 
-    std::cout << "finished computation at " << std::ctime(&end_time)
-              << "elapsed time: " << elapsed_seconds.count() << "s"
-              << std::endl;
     return 0;
 }

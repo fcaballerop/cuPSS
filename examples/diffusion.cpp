@@ -1,36 +1,16 @@
-/* Short explanation on the way to add fields and terms in this file
+/* This file implements a noisy diffusion solver, also known
+ * as Edwards-Wilkinson model. For a field phi, the equation
+ * of motion is
  *
- * evolver is a class that merely calls updates on all fields and terms
- * the arguments on its constructor are 
+ * dphi       / d^2phi   d^2phi \
+ * ----  = D  | ------ + ------ |  + eta
+ *  dt        \  dx^2     dy^2  /
+ * 
+ * where eta is a White Gaussian noise with variance 2D
  *
- *      evolver system(x,           sx,             sy,             dx,       dy,       dt);
- *                     Use CUDA | x-system size | y-system size | delta_x | delta_y | delta_t
- *
- * To this evolver we can add fields:
- *
- *      system.createField( name, dynamic );
- *
- * name is a string and dynamic if a boolean that sets whether the field
- * is set in each step through a time derivative or through an equality.
- *
- * To each field we can add terms
- *      
- *      system.createTerm(  field_name, prefactor, {field_1, ..., field_n}  );
- *
- *  This term would be a term of "field_name", with that prefactor, that multiplies
- *  fields field_1 to field_n.
- */ 
-
-#include <cmath>
-#include <cstdlib>
-#include <cuda_runtime_api.h>
-#include <driver_types.h>
+ */
 #include <iostream>
-#include <ostream>
-#include "../inc/defines.h"
-#include "../inc/evolver.h"
-#include "../inc/field.h"
-#include "../inc/term.h"
+#include "../inc/cupss.h"
 
 #ifdef WITHCUDA
 #include <cuda.h>
@@ -46,34 +26,24 @@ int main(int argc, char **argv)
 
     system.createField("phi", true);        // 0
 
-    system.fields[0]->implicit.push_back({-1.0f, 1, 0, 0, 0});
+    system.addParameter("D", 1.0f);
 
-    system.fields[0]->isNoisy = true;
-    system.fields[0]->noiseType = GaussianWhite;
-    system.fields[0]->noise_amplitude = {100.0f, 0, 0, 0, 0};
+    system.addEquation("dt phi +D*q^2*phi = 0");
 
-    // Random initial state
-    std::srand(1324);
+    system.addNoise("phi", "100.0*D");
+
+    // Initial state is a Gaussian distribution
     for (int j = 0; j < NY; j++)
     {
         for (int i = 0; i < NX; i++)
         {
             int index = j * NX + i;
-            system.fields[0]->real_array[index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f))/(0.1f * (float)(NX*NX)));
-            system.fields[0]->real_array[index].y = 0.0f;
+            system.fieldsReal["phi"][index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f))/(0.1f * (float)(NX*NX)));
         }
     }
 
-    cudaMemcpy(system.fields[0]->real_array_d, system.fields[0]->real_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    cudaMemcpy(system.fields[0]->comp_array_d, system.fields[0]->comp_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    system.fields[0]->toComp();
-
-    for (int i = 0; i < system.fields.size(); i++)
-    {
-        system.fields[i]->prepareDevice();
-        system.fields[i]->precalculateImplicit(system.dt);
-    }
-    system.fields[0]->outputToFile = true;
+    system.prepareProblem();
+    system.setOutputField("phi", true);
 
     int steps = 50000;
     int check = steps/100;
@@ -86,6 +56,7 @@ int main(int argc, char **argv)
         system.advanceTime();
         if (i % check == 0)
         {
+            // Simple progress bar
             std::cout << "Progress: " << i/check << "%\r";
             std::cout.flush();
         }

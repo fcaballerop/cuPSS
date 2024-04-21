@@ -1,9 +1,4 @@
-#include <cmath>
-#include <cstdlib>
-#include <cuda_runtime_api.h>
-#include <driver_types.h>
 #include <iostream>
-#include <ostream>
 #include "../inc/cupss.h"
 
 #ifdef WITHCUDA
@@ -23,14 +18,8 @@ int main(int argc, char **argv)
     system.addParameter("a", -1.0f);
     system.addParameter("b", 1.0f);
     system.addParameter("k", 4.0f);
-    system.addParameter("D", 0.01f);
 
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 ");
-
-    system.addNoise("phi", "D * q^2");
-
-    system.printInformation();
-
     for (int j = 0; j < NY; j++)
     {
         for (int i = 0; i < NX; i++)
@@ -44,7 +33,7 @@ int main(int argc, char **argv)
 
     system.setOutputField("phi", true);
 
-    int steps = 10000;
+    int steps = 100000;
     int check = steps/100;
     if (check < 1) check = 1;
 

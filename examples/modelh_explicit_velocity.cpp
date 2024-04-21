@@ -1,11 +1,4 @@
-#include <cmath>
-#include <cstdlib>
-#include <cuda_runtime_api.h>
-#include <driver_types.h>
 #include <iostream>
-#include <ostream>
-#include <chrono>
-#include <ctime>
 #include "../inc/cupss.h"
 
 #ifdef WITHCUDA
@@ -48,7 +41,6 @@ int main(int argc, char **argv)
     system.addEquation("vy * (friction + eta*q^2) = (iqx + iqx*iqy^2*1/q^2 + iqx*iqy^2*1/q^2) * sigxy + (-iqy - iqy^3*1/q^2 + iqx^2*iqy*1/q^2) * sigxx");
     system.addEquation("w = 0.5*iqx * vy - 0.5*iqy*vx ");
 
-    system.printInformation();
 
     // Random initial state
     std::srand(1324);
