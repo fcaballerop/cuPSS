@@ -128,18 +128,6 @@ int parser::exists_parameter(const std::string &p_name)
     return 0;
 }
 
-int parser::is_split_character(char character)
-{
-    for (int i = 0; i < token_split_char.size(); i++)
-    {
-        if (character == token_split_char[i])
-        {
-            return 1;
-        }
-    }
-    return 0;
-}
-
 int parser::is_number(const std::string &term)
 {
     int _is_number = 1;
@@ -630,14 +618,6 @@ int parser::add_equation(const std::string &_equation)
     expand_all(lhs_terms);
     expand_all(rhs_terms);
 
-    std::cout << "LHS\n";
-    for (int i = 0; i < lhs_terms.size(); i++)
-        std::cout << lhs_terms[i] << "\n";
-    std::cout << "RHS\n";
-    for (int i = 0; i < rhs_terms.size(); i++)
-        std::cout << rhs_terms[i] << "\n";
-
-
     std::vector<pres> implicits;
 
     std::vector<std::vector<pres>> prefactor_vector;
@@ -667,9 +647,7 @@ int parser::add_equation(const std::string &_equation)
             std::cout << lhs_terms[0] << std::endl;
             return -1;
         }
-        std::cout << "Getting field name\n";
         field_name = get_field_name(lhs_terms[0]);
-        std::cout << field_name << "\n";
     }
 
     // process lhs
