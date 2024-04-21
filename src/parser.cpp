@@ -5,7 +5,6 @@
 #include <fstream>
 #include <algorithm>
 
-
 parser::parser(evolver *_system)
 {
     system = _system;
