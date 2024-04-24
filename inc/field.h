@@ -98,9 +98,9 @@ class field
 
     pres *implicit_terms;
 
-    // boundary conditions
-    bool hasBC;
-    void (*boundary) (float2 *, int, int);
+    // callback functions 
+    bool hasCB;
+    void (*callback) (float2 *, int, int);
 
     dim3 threads_per_block;
     dim3 blocks;

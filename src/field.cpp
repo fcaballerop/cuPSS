@@ -67,25 +67,25 @@ int field::setRHS(float dt)
     // Normalize and remove imaginary errors
     normalize();
 
-    // If there are boundary conditions on the field, they should be executed
+    // If there are callback functions defined for the field, they should be executed
     // here, maybe take a pointer to a function to be called back here
-    if (hasBC)
+    if (hasCB)
     {
-        if (boundary == NULL)
+        if (callback == NULL)
         {
-            std::cout << "Wants to apply BC but pointer to BC is NULL" << std::endl;
+            std::cout << "Wants to apply callback function but pointer to function is NULL" << std::endl;
         }
         else {
             if ( isCUDA )
             {
-                boundary(real_array_d, sx, sy);
+                callback(real_array_d, sx, sy);
                 if (needsaliasing)
-                    boundary(real_dealiased_d, sx, sy);
+                    callback(real_dealiased_d, sx, sy);
             }
             else {
-                boundary(real_array, sx, sy);
+                callback(real_array, sx, sy);
                 if (needsaliasing)
-                    boundary(real_dealiased, sx, sy);
+                    callback(real_dealiased, sx, sy);
             }
         }
     }

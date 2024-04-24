@@ -131,9 +131,9 @@ field::field(int _sx, int _sy, float _dx, float _dy) : sx(_sx), sy(_sy), dx(_dx)
     cudaMemcpy(real_dealiased_d, real_dealiased, sx * sy * sizeof(float2), cudaMemcpyHostToDevice);
     cudaMemcpy(comp_dealiased_d, comp_dealiased, sx * sy * sizeof(float2), cudaMemcpyHostToDevice);
 
-    // boundary conditions
-    hasBC = false;
-    boundary = NULL;
+    // callback functions
+    hasCB = false;
+    callback = NULL;
 
     // noise
     isNoisy = false;
