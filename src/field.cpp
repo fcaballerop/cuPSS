@@ -78,14 +78,14 @@ int field::setRHS(float dt)
         else {
             if ( isCUDA )
             {
-                callback(real_array_d, sx, sy);
+                callback(system_p, real_array_d, sx, sy);
                 if (needsaliasing)
-                    callback(real_dealiased_d, sx, sy);
+                    callback(system_p, real_dealiased_d, sx, sy);
             }
             else {
-                callback(real_array, sx, sy);
+                callback(system_p, real_array, sx, sy);
                 if (needsaliasing)
-                    callback(real_dealiased, sx, sy);
+                    callback(system_p, real_dealiased, sx, sy);
             }
         }
     }

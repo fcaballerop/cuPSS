@@ -86,6 +86,7 @@ void evolver::prepareProblem()
     {
         fields[i]->prepareDevice();
         fields[i]->precalculateImplicit(dt);
+        fields[i]->system_p = this;
     }
 }
 

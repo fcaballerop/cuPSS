@@ -16,6 +16,8 @@ class term;
 
 struct pres;
 
+class evolver;
+
 class field
 {
     private:
@@ -59,6 +61,8 @@ class field
 
     bool outputToFile;
 
+    evolver *system_p;
+
     float2 *real_array;
     float2 *comp_array;
 
@@ -100,7 +104,7 @@ class field
 
     // callback functions 
     bool hasCB;
-    void (*callback) (float2 *, int, int);
+    void (*callback) (evolver *, float2 *, int, int);
 
     dim3 threads_per_block;
     dim3 blocks;
