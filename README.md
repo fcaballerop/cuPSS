@@ -35,8 +35,8 @@ git clone https://github.com/fcaballerop/cuPSS.git
 Then compile the library, (check dependencies above if any errors come up during compilation)
 ```
 cd src/
-nvcc -c *cpp -DWITHCUDA -O2
-nvcc -c *cu -DWITHCUDA -O2
+nvcc -c *cpp -O2
+nvcc -c *cu -O2
 ar rcs libcupss.a *o
 cd ../
 ```
