@@ -1,15 +1,8 @@
 #ifndef HELPS_H
 #define HELPS_H
 
-// #ifdef WITHCUDA
 #include <cuda_runtime.h>
-// #else
-// struct float2  // might have to change with cuda
-// {
-//     float x; float y;
-// };
-// #endif
-//
+
 #include <iostream>
 #include <string>
 #include <vector>

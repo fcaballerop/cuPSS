@@ -16,12 +16,7 @@
 evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float _dt, int _ses) : sx(_sx), sy(_sy), dx(_dx), dy(_dy), dt(_dt), writeEveryNSteps(_ses)
 {
     std::srand(time(NULL));
-    #ifdef WITHCUDA
     with_cuda = _with_cuda;
-    #else
-    std::cout << "Compiled without CUDA, ignoring GPU settings and running on CPU" << std::endl;
-    with_cuda = false;
-    #endif
 
     currentTime = 0.0f;
     currentTimeStep = 0;
@@ -212,9 +207,7 @@ int evolver::advanceTime()
 
 void evolver::test()
 {
-    #ifdef WITHCUDA
     std::cout << "With cuda " << with_cuda << std::endl;
-    #endif
 }
 
 void evolver::writeOut()
