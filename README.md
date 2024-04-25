@@ -32,25 +32,34 @@ To run the cuPSS examples, first clone the repository
 ```
 git clone https://github.com/fcaballerop/cuPSS.git
 ```
-Then compile the library, (check dependencies above if any errors come up during compilation)
+Then compile the library, (check dependencies above if any errors come up during compilation). A CMake file is given for convenience, so cupss can be installed system wide by running
 ```
-cd src/
-nvcc -c *cpp -O2
+mkdir build
+cd build
+cmake ../
+cmake --build .
+sudo cmake --install .
+```
+This will create a file `build/libcupss.a` which can the be linked to any particular solver. The last command will copy this library to `/usr/lib`, and the header files to `/usr/include`. If cmake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
+```
+cd src
 nvcc -c *cu -O2
 ar rcs libcupss.a *o
-cd ../
+cd ..
 ```
-This will create a file `src/libcupss.a` which can the be linked to any particular solver.
+This will create a file `src/libcupss.a` which can be linked to any particular solver.
 
 A number of example solvers can be found in the `examples` directory. They can be compiled by compiling with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
 ```
-nvcc examples/modelb.cpp -Lsrc/ -lcufft -lfftw3f -lcurand -lcupss -O2 -o modelb
+nvcc examples/cahn-hilliard.cpp --lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
 ```
-
+If cupss was not installed globally, the location of `libcupss.a` must be specified:
+```
+nvcc examples/cahn-hilliard.cpp -Lsrc/ -lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
+```
 The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located. It will be in `src/` if the library has been compiled with the lines above. The solver can be run by
 ```
-mkdir data
-./modelb
+./cahn-hilliard
 ```
 The solver outputs data by default to a directory called `data` from where it's called. The output files contain raw data of the states of the field at each timestep at which they're written out.
 
