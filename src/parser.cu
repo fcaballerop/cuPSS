@@ -1,6 +1,4 @@
-#include "../inc/parser.h"
-#include "../inc/evolver.h"
-#include "../inc/field.h"
+#include "../inc/cupss.h"
 #include <sstream>
 #include <fstream>
 #include <algorithm>

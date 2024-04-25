@@ -27,18 +27,13 @@
 #include <driver_types.h>
 #include <iostream>
 #include <ostream>
-#include "../inc/defines.h"
-#include "../inc/evolver.h"
-#include "../inc/field.h"
-#include "../inc/term.h"
+#include "../inc/cupss.h"
 
-#ifdef WITHCUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
-#endif
 
-#define NX 2048
-#define NY 2048
+#define NX 512
+#define NY 512
 
 int main(int argc, char **argv)
 {
@@ -60,13 +55,10 @@ int main(int argc, char **argv)
         {
             int index = j * NX + i;
             system.fields[0]->real_array[index].x = -0.0f + 0.001f * (float)(rand()%200-100);
-            system.fields[0]->real_array[index].y = 0.0f;
         }
     }
 
-    cudaMemcpy(system.fields[0]->real_array_d, system.fields[0]->real_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    cudaMemcpy(system.fields[0]->comp_array_d, system.fields[0]->comp_array, NX*NY*sizeof(float2), cudaMemcpyHostToDevice);
-    system.fields[0]->toComp();
+    system.prepareProblem();
 
     system.fields[0]->isNoisy = false;
     system.fields[0]->noiseType = GaussianWhite;

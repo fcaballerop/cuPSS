@@ -4,7 +4,7 @@
 #include <driver_types.h>
 #include <iostream>
 
-#include "../inc/term_kernels.cuh"
+#include "../inc/cupss/term_kernels.cuh"
 
 extern "C" void computeProduct_gpu(float2 **product, float2 *out, int prodSize, int sx, int sy, dim3 blocks, dim3 threadsPerBlock)
 {

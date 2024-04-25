@@ -9,10 +9,8 @@
 #include <iostream>
 #include <random>
 #include <ostream>
-#include "../inc/field.h"
-#include "../inc/field_kernels.cuh"
-#include "../inc/term.h"
-#include "../inc/defines.h"
+#include "../inc/cupss.h"
+#include "../inc/cupss/field_kernels.cuh"
 
 int field::updateTerms()
 {

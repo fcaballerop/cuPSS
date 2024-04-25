@@ -10,10 +10,7 @@
 #include <iostream>
 #include <random>
 #include <ostream>
-#include "../inc/field.h"
-#include "../inc/field_kernels.cuh"
-#include "../inc/term.h"
-#include "../inc/defines.h"
+#include "../inc/cupss.h"
 
 field::field(int _sx, int _sy, float _dx, float _dy) : sx(_sx), sy(_sy), dx(_dx), dy(_dy), stepqx(2.0f*PI/(_dx * (float)_sx)), stepqy(2.0f*PI/(_dy * (float)_sy)), rng(rd()), dist(std::normal_distribution<>(0, 1.0))
 {
@@ -162,7 +159,7 @@ void field::prepareDevice()
 
 void field::precalculateImplicit(float dt)
 {
-    int dimension = 1 + (sy==1 ? 0 : 1);
+    // int dimension = 1 + (sy==1 ? 0 : 1);
     for (int j = 0; j < sy; j++)
     {
         for (int i = 0; i < sx; i++)

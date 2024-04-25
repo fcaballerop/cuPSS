@@ -1,7 +1,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-#include "../inc/field_kernels.cuh"
+#include "../inc/cupss/field_kernels.cuh"
 
 extern "C" void setNotDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, float stepqx, float stepqy, float *precomp, dim3 blocks, dim3 threadsPerBlock)
 {

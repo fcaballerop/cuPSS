@@ -8,10 +8,7 @@
 #include <string>
 #include <cuda_runtime.h>
 #include <filesystem>
-#include "../inc/evolver.h"
-#include "../inc/field.h"
-#include "../inc/term.h"
-#include "../inc/parser.h"
+#include "../inc/cupss.h"
 
 evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float _dt, int _ses) : sx(_sx), sy(_sy), dx(_dx), dy(_dy), dt(_dt), writeEveryNSteps(_ses)
 {

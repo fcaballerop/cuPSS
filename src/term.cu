@@ -6,9 +6,8 @@
 #include <cufft.h>
 #include <driver_types.h>
 #include <fftw3.h>
-#include "../inc/term.h"
-#include "../inc/field.h"
-#include "../inc/term_kernels.cuh"
+#include "../inc/cupss.h"
+#include "../inc/cupss/term_kernels.cuh"
 
 int term::update()
 {

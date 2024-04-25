@@ -6,9 +6,7 @@
 #include <cufft.h>
 #include <driver_types.h>
 #include <fftw3.h>
-#include "../inc/term.h"
-#include "../inc/field.h"
-#include "../inc/term_kernels.cuh"
+#include "../inc/cupss.h"
 
 term::term(int _sx, int _sy, float _dx, float _dy) : sx(_sx), sy(_sy), dx(_dx), dy(_dy), stepqx(2.0f*PI/(_dx * (float)_sx)), stepqy(2.0f*PI/(_dy * (float)_sy))
 {

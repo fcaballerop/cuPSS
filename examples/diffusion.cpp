@@ -12,10 +12,8 @@
 #include <iostream>
 #include "../inc/cupss.h"
 
-#ifdef WITHCUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
-#endif
 
 #define NX 256
 #define NY 256 
@@ -25,12 +23,14 @@ int main(int argc, char **argv)
     evolver system(1, NX, NY, 1.0f, 1.0f, 0.1f, 100);
 
     system.createField("phi", true);        // 0
+    system.createField("lphi", false);
 
     system.addParameter("D", 1.0f);
 
-    system.addEquation("dt phi +D*q^2*phi = 0");
+    system.addEquation("dt phi = lphi");
+    system.addEquation("lphi = -D*q^2*phi");
 
-    system.addNoise("phi", "100.0*D");
+    system.addNoise("phi", "0.0*D");
 
     // Initial state is a Gaussian distribution
     for (int j = 0; j < NY; j++)
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
         for (int i = 0; i < NX; i++)
         {
             int index = j * NX + i;
-            system.fieldsReal["phi"][index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f))/(0.1f * (float)(NX*NX)));
+            system.fieldsReal["phi"][index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f))/(0.01f * (float)(NX*NX)));
         }
     }
 

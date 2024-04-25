@@ -1,10 +1,8 @@
 #include <iostream>
 #include "../inc/cupss.h"
 
-#ifdef WITHCUDA
 #include <cuda.h>
 #include <cuda_runtime.h>
-#endif
 
 #define NX 256
 #define NY 256 
