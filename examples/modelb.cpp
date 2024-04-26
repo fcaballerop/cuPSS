@@ -32,59 +32,62 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define NX 512
-#define NY 512
+#define NX 64
+#define NY 64
+#define NZ 64
 
 int main(int argc, char **argv)
 {
-    evolver system(1, NX, NY, 20.0f/128.0f, 20.0f/128.0f, 0.0001f, 5000);
+    std::cout << "Creating evolver\n";
+    evolver system(1, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.001f, 1);
 
+    std::cout << "Creating field\n";
     system.createField("phi", true);        // 0
+    system.createField("cube", false);        // 0
 
     // Terms for field phi
-    system.createTerm("phi", {{-1.0f, 1, 0, 0, 0}}, {"phi", "phi", "phi"});
+    std::cout << "Creating term\n";
+    // system.createTerm("phi", {{-1.0f, 1, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
+    system.createTerm("cube", {{1.0f, 0, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
 
-    system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0});
-    system.fields[0]->implicit.push_back({-1.0f, 2, 0, 0, 0});
+    std::cout << "Creating implicits\n";
+    // system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0, 0});
+    // system.fields[0]->implicit.push_back({-4.0f, 2, 0, 0, 0, 0});
 
     // Random initial state
     std::srand(1324);
-    for (int j = 0; j < NY; j++)
+    std::cout << "Creating initial condition\n";
+    for (int k = 0; k < NZ; k++)
     {
-        for (int i = 0; i < NX; i++)
+        for (int j = 0; j < NY; j++)
         {
-            int index = j * NX + i;
-            system.fields[0]->real_array[index].x = -0.0f + 0.001f * (float)(rand()%200-100);
+            for (int i = 0; i < NX; i++)
+            {
+                int index = k * NX * NY + j * NX + i;
+                // system.fields[0]->real_array[index].x = 0.0001f * (float)(rand()%200-100);
+                system.fieldsReal["phi"][index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f)+ ((float)k - (float)NZ/2.0f)*((float)k - (float)NZ/2.0f))/(0.01f * (float)(NX*NX*NX)));
+            }
         }
     }
 
+    std::cout << "Preparing problem\n";
     system.prepareProblem();
 
-    system.fields[0]->isNoisy = false;
-    system.fields[0]->noiseType = GaussianWhite;
-    system.fields[0]->noise_amplitude = {0.1f, 1, 0, 0, 0};
-    
-    for (int i = 0; i < system.fields.size(); i++)
-    {
-        system.fields[i]->prepareDevice();
-        system.fields[i]->precalculateImplicit(system.dt);
-    }
-    system.fields[0]->outputToFile = true;
-
-    int steps = 100000;
+    int steps = 3;
     int check = steps/100;
     if (check < 1) check = 1;
     
     system.printInformation();
 
+    std::cout << "Starting integration\n";
     for (int i = 0; i < steps; i++)
     {
         system.advanceTime();
-        if (i % check == 0)
-        {
-            std::cout << "Progress: " << i/check << "%\r";
-            std::cout.flush();
-        }
+        // if (i % check == 0)
+        // {
+        //     std::cout << "Progress: " << i/check << "%\r";
+        //     std::cout.flush();
+        // }
     }
 
     return 0;

@@ -34,10 +34,10 @@ void evolver::common_constructor()
     }
     else 
     {
-        threads_per_block = dim3(32,32,32);
-        int bx = (sx+31)/32;
-        int by = (sy+31)/32;
-        int bz = (sz+31)/32;
+        threads_per_block = dim3(8, 8, 8);
+        int bx = (sx+7)/8;
+        int by = (sy+7)/8;
+        int bz = (sz+7)/8;
 
         blocks = dim3(bx,by,bz);
     }

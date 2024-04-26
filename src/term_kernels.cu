@@ -62,6 +62,10 @@ __global__ void computeProduct_k(float2 **product, float2 *out, int prodSize, in
         }
         out[index].x = result;
         out[index].y = 0.0f;
+        if (i == 0 && j == 0 && k ==0)
+        {
+            printf("Prod size %d, resul %f, origin %f\n", prodSize, result, product[0][index].x);
+        }
     }
 }
 
