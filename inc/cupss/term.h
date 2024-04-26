@@ -22,9 +22,9 @@ private:
     int applyPrefactors();  // Fourier prefactors
     int applyPres_vector(); // Same as above but multiple
     int precomputePrefactors();
-    const int sx, sy;             // system size
-    const float dx, dy;           // cell size
-    const float stepqx, stepqy;   // smallest wavelength, 
+    const int sx, sy, sz;             // system size
+    const float dx, dy, dz;           // cell size
+    const float stepqx, stepqy, stepqz;   // smallest wavelength, 
 
 
     // fftw stuff
@@ -32,7 +32,10 @@ private:
 
     cufftHandle plan_gpu;
 public:
+    term(int, float);
     term(int, int, float, float);
+    term(int, int, int, float, float, float);
+    void common_constructor();
     int prepareDevice();
 
     bool isCUDA;

@@ -14,8 +14,8 @@ struct pres;
 class evolver
 {
 private:
-    const int sx, sy;
-    const float dx, dy;
+    const int sx, sy, sz;
+    const float dx, dy, dz;
     const int writeEveryNSteps;
     parser *_parser;
 public:
@@ -24,7 +24,10 @@ public:
     float dt;
     float dtsqrt;
     std::vector<field*> fields;
+    evolver(bool, int, float, float, int);
     evolver(bool, int, int, float, float, float, int);
+    evolver(bool, int, int, int, float, float, float, float, int);
+    void common_constructor();
 
     std::map<std::string, field *> fieldsMap;
     std::map<std::string, float2 *> fieldsReal;

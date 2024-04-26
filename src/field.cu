@@ -34,12 +34,12 @@ int field::setRHS(float dt)
         if (!dynamic)
         {
             setNotDynamic_gpu(terms_d, terms.size(), implicit_terms, implicit.size(), 
-                    comp_array_d, sx, sy, stepqx, stepqy, precomp_implicit_d, blocks, threads_per_block);
+                    comp_array_d, sx, sy, sz, stepqx, stepqy, stepqz, precomp_implicit_d, blocks, threads_per_block);
         }
         else 
         {
             setDynamic_gpu(terms_d, terms.size(), implicit_terms, implicit.size(),
-                    comp_array_d, sx, sy, stepqx, stepqy, dt, precomp_implicit_d,
+                    comp_array_d, sx, sy, sz, stepqx, stepqy, stepqz, dt, precomp_implicit_d,
                     isNoisy, noise_fourier, precomp_noise_d, blocks, threads_per_block);
         }
     }
@@ -76,14 +76,14 @@ int field::setRHS(float dt)
         else {
             if ( isCUDA )
             {
-                callback(system_p, real_array_d, sx, sy);
+                callback(system_p, real_array_d, sx, sy, sz);
                 if (needsaliasing)
-                    callback(system_p, real_dealiased_d, sx, sy);
+                    callback(system_p, real_dealiased_d, sx, sy, sz);
             }
             else {
-                callback(system_p, real_array, sx, sy);
+                callback(system_p, real_array, sx, sy, sz);
                 if (needsaliasing)
-                    callback(system_p, real_dealiased, sx, sy);
+                    callback(system_p, real_dealiased, sx, sy, sz);
             }
         }
     }
@@ -96,47 +96,51 @@ int field::setRHS(float dt)
 
 void field::setNotDynamic()
 {
-    for (int j = 0; j < sy; j++)
+    for (int k = 0; k < sz; k++)
     {
-        for (int i = 0; i < sx; i++)
+        for (int j = 0; j < sy; j++)
         {
-            int index = j * sx + i;
-            for (int term = 0; term < terms.size(); term++)
+            for (int i = 0; i < sx; i++)
             {
-                if (term == 0)
+                int index = k * sx * sy + j * sx + i;
+                for (int term = 0; term < terms.size(); term++)
                 {
-                    comp_array[index].x = terms[term]->term_comp[index].x;
-                    comp_array[index].y = terms[term]->term_comp[index].y;
-                }
-                else
-                {
-                    comp_array[index].x += terms[term]->term_comp[index].x;
-                    comp_array[index].y += terms[term]->term_comp[index].y;
-                }
-            }
-            if (implicit.size() > 0 && index != 0) // last condition easy fix for q=0 case
-            {
-                float implicitFactor = 0.0f;
-                float qx = (i < (sx+1)/2 ? (float)i : (float)(i - sx)) * stepqx;
-                float qy = (j < (sy+1)/2 ? (float)j : (float)(j - sy)) * stepqy;
-                float q2 = qx*qx + qy*qy;
-                for (int k = 0; k < implicit.size(); k++)
-                {
-                    float thisImplicit = implicit[k].preFactor;
-                    // At this point only scalars allowed (q2n and invq)
-                    if (implicit[k].q2n != 0)
-                        thisImplicit *= std::pow(q2, implicit[k].q2n);
-                    if (implicit[k].invq != 0)
+                    if (term == 0)
                     {
-                        float invq = 0.0f;
-                        if (i > 0 || j > 0)
-                            invq = 1.0f / std::sqrt(q2);
-                        thisImplicit *= std::pow(invq, implicit[k].invq);
+                        comp_array[index].x = terms[term]->term_comp[index].x;
+                        comp_array[index].y = terms[term]->term_comp[index].y;
                     }
-                    implicitFactor += thisImplicit;
+                    else
+                    {
+                        comp_array[index].x += terms[term]->term_comp[index].x;
+                        comp_array[index].y += terms[term]->term_comp[index].y;
+                    }
                 }
-                comp_array[index].x /= implicitFactor;
-                comp_array[index].y /= implicitFactor;
+                if (implicit.size() > 0 && index != 0) // last condition easy fix for q=0 case
+                {
+                    float implicitFactor = 0.0f;
+                    float qx = (i < (sx+1)/2 ? (float)i : (float)(i - sx)) * stepqx;
+                    float qy = (j < (sy+1)/2 ? (float)j : (float)(j - sy)) * stepqy;
+                    float qz = (k < (sz+1)/2 ? (float)k : (float)(k - sz)) * stepqz;
+                    float q2 = qx*qx + qy*qy + qz*qz;
+                    for (int imp = 0; imp < implicit.size(); k++)
+                    {
+                        float thisImplicit = implicit[imp].preFactor;
+                        // At this point only scalars allowed (q2n and invq)
+                        if (implicit[imp].q2n != 0)
+                            thisImplicit *= std::pow(q2, implicit[imp].q2n);
+                        if (implicit[imp].invq != 0)
+                        {
+                            float invq = 0.0f;
+                            if (i > 0 || j > 0)
+                                invq = 1.0f / std::sqrt(q2);
+                            thisImplicit *= std::pow(invq, implicit[imp].invq);
+                        }
+                        implicitFactor += thisImplicit;
+                    }
+                    comp_array[index].x /= implicitFactor;
+                    comp_array[index].y /= implicitFactor;
+                }
             }
         }
     }
@@ -166,47 +170,29 @@ void field::setDynamic(float dt)
 
 void field::stepEuler(float dt)
 {
-    for (int j = 0; j < sy; j++)
+    for (int k = 0; k < sz; k++)
     {
-        for (int i = 0; i < sx; i++)
+        for (int j = 0; j < sy; j++)
         {
-            int index = j * sx + i;
-            for (int term = 0; term < terms.size(); term++)
+            for (int i = 0; i < sx; i++)
             {
-                comp_array[index].x += dt * terms[term]->term_comp[index].x;
-                comp_array[index].y += dt * terms[term]->term_comp[index].y;
-            }
-            // After adding all explicit terms, we divide over the implicits
-            if (implicit.size() > 0)
-            {
-                // float implicitFactor = 1.0f;
-                // float qx = (i < (sx+1)/2 ? (float)i : (float)(i - sx)) * stepqx;
-                // float qy = (j < (sy+1)/2 ? (float)j : (float)(j - sy)) * stepqy;
-                // float q2 = qx*qx + qy*qy;
-                // for (int k = 0; k < implicit.size(); k++)
-                // {
-                //     float thisImplicit = implicit[k].preFactor;
-                //     // At this point only scalars allowed (q2n and invq)
-                //     if (implicit[k].q2n != 0)
-                //         thisImplicit *= std::pow(q2, implicit[k].q2n);
-                //     if (implicit[k].invq != 0)
-                //     {
-                //         float invq = 0.0f;
-                //         if (i > 0 || j > 0)
-                //             invq = 1.0f / std::sqrt(q2);
-                //         thisImplicit *= std::pow(invq, implicit[k].invq);
-                //     }
-                //     implicitFactor -= dt * thisImplicit;
-                // }
-                // comp_array[index].x /= implicitFactor;
-                // comp_array[index].y /= implicitFactor;
-                comp_array[index].x /= precomp_implicit[index];
-                comp_array[index].y /= precomp_implicit[index];
-            }
-            if (isNoisy)
-            {
-                comp_array[index].x += precomp_noise[index] * noise_comp[index].x;
-                comp_array[index].y += precomp_noise[index] * noise_comp[index].y;
+                int index = k * sx * sy + j * sx + i;
+                for (int term = 0; term < terms.size(); term++)
+                {
+                    comp_array[index].x += dt * terms[term]->term_comp[index].x;
+                    comp_array[index].y += dt * terms[term]->term_comp[index].y;
+                }
+                // After adding all explicit terms, we divide over the implicits
+                if (implicit.size() > 0)
+                {
+                    comp_array[index].x /= precomp_implicit[index];
+                    comp_array[index].y /= precomp_implicit[index];
+                }
+                if (isNoisy)
+                {
+                    comp_array[index].x += precomp_noise[index] * noise_comp[index].x;
+                    comp_array[index].y += precomp_noise[index] * noise_comp[index].y;
+                }
             }
         }
     }
@@ -227,26 +213,31 @@ void field::dealias()
     if (isCUDA)
     {
         cudaDeviceSynchronize();
-        dealias_gpu(comp_array_d, comp_dealiased_d, sx, sy, aliasing_order, blocks, threads_per_block);
+        dealias_gpu(comp_array_d, comp_dealiased_d, sx, sy, sz, aliasing_order, blocks, threads_per_block);
     }
     else {
-        for (int j = 0; j < sy; j++)
+        for (int k = 0; k < sz; k++)
         {
-            for (int i = 0; i < sx; i++)
+            for (int j = 0; j < sy; j++)
             {
-                int index = j * sx + i;
-                int ni = i;
-                int nj = j;
-                if (ni > sx/2) ni -= sx;
-                if (nj > sy/2) nj -= sy;
-                if (std::abs(ni) > sx/(aliasing_order+1) || std::abs(nj) > sy/(aliasing_order+1))
+                for (int i = 0; i < sx; i++)
                 {
-                    comp_dealiased[index].x = 0.0f;
-                    comp_dealiased[index].y = 0.0f;
-                }
-                else {
-                    comp_dealiased[index].x = comp_array[index].x;
-                    comp_dealiased[index].y = comp_array[index].y;
+                    int index = k * sx * sy + j * sx + i;
+                    int ni = i;
+                    int nj = j;
+                    int nk = k;
+                    if (ni > sx/2) ni -= sx;
+                    if (nj > sy/2) nj -= sy;
+                    if (nk > sz/2) nk -= sz;
+                    if (std::abs(ni) > sx/(aliasing_order+1) || std::abs(nj) > sy/(aliasing_order+1) || std::abs(nj) > sz/(aliasing_order+1))
+                    {
+                        comp_dealiased[index].x = 0.0f;
+                        comp_dealiased[index].y = 0.0f;
+                    }
+                    else {
+                        comp_dealiased[index].x = comp_array[index].x;
+                        comp_dealiased[index].y = comp_array[index].y;
+                    }
                 }
             }
         }
@@ -255,13 +246,16 @@ void field::dealias()
 
 void field::setToZero()
 {
-    for (int j = 0; j < sy; j++)
+    for (int k = 0; k < sz; k++)
     {
-        for (int i = 0; i < sx; i++)
+        for (int j = 0; j < sy; j++)
         {
-            int index = j * sx + i;
-            comp_array[index].x = 0.0f;
-            comp_array[index].y = 0.0f;
+            for (int i = 0; i < sx; i++)
+            {
+                int index = k * sx * sy + j * sx + i;
+                comp_array[index].x = 0.0f;
+                comp_array[index].y = 0.0f;
+            }
         }
     }
 }
@@ -304,24 +298,27 @@ void field::normalize()
     if (isCUDA)
     {
         cudaDeviceSynchronize();
-        normalize_gpu(real_array_d, sx, sy, blocks, threads_per_block);
+        normalize_gpu(real_array_d, sx, sy, sz, blocks, threads_per_block);
         if (needsaliasing)
-            normalize_gpu(real_dealiased_d, sx, sy, blocks, threads_per_block);
+            normalize_gpu(real_dealiased_d, sx, sy, sz, blocks, threads_per_block);
     }
     else
     {
-        float normalization = 1.0f / ((float)(sx*sy));
-        for (int j = 0; j < sy; j++)
+        float normalization = 1.0f / ((float)(sx*sy*sz));
+        for (int k = 0; k < sz; k++)
         {
-            for (int i = 0; i < sx; i++)
+            for (int j = 0; j < sy; j++)
             {
-                int index = j * sx + i;
-                real_array[index].x *= normalization;
-                real_array[index].y = 0.0f;
-                if (needsaliasing)
+                for (int i = 0; i < sx; i++)
                 {
-                    real_dealiased[index].x *= normalization;
-                    real_dealiased[index].y = 0.0f;
+                    int index = k * sx * sy + j * sx + i;
+                    real_array[index].x *= normalization;
+                    real_array[index].y = 0.0f;
+                    if (needsaliasing)
+                    {
+                        real_dealiased[index].x *= normalization;
+                        real_dealiased[index].y = 0.0f;
+                    }
                 }
             }
         }
@@ -338,9 +335,9 @@ void field::createNoise()
             // curandGenerateNormal(gen_d, noise_comp_d_r, sx*sy, 0.0f, 0.707f); // 1/sqrt(2)
             // cudaDeviceSynchronize();
             // curandGenerateNormal(gen_d, noise_comp_d_i, sx*sy, 0.0f, 0.707f);
-            curandGenerateNormal(gen_d, gen_noise, sx*sy, 0.0f, 1.0f);
+            curandGenerateNormal(gen_d, gen_noise, sx*sy*sz, 0.0f, 1.0f);
             cudaDeviceSynchronize();
-            copyToFloat2_gpu(gen_noise, noise_real, sx, sy, blocks, threads_per_block);
+            copyToFloat2_gpu(gen_noise, noise_real, sx, sy, sz, blocks, threads_per_block);
             cudaDeviceSynchronize();
             cufftExecC2C(plan_gpu, noise_real, noise_fourier, CUFFT_FORWARD);
             // correctNoiseAmplitude_gpu(noise_fourier, precomp_noise_d, sx, sy);
@@ -350,14 +347,17 @@ void field::createNoise()
     }
     else
     {
-        for (int j = 0; j < sy; j++)
+        for (int k = 0; k < sz; k++)
         {
-            for (int i = 0; i < sx; i++)
+            for (int j = 0; j < sy; j++)
             {
-                int index = j * sx + i;
-                float r1 = dist(rng);
-                noise_gend[index].x = r1;
-                noise_gend[index].y = 0.0f;
+                for (int i = 0; i < sx; i++)
+                {
+                    int index = k * sx * sy + j * sx + i;
+                    float r1 = dist(rng);
+                    noise_gend[index].x = r1;
+                    noise_gend[index].y = 0.0f;
+                }
             }
         }
         fftwf_execute(noise_plan);

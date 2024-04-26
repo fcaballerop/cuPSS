@@ -19,12 +19,22 @@ struct system_constants
     int writeEveryNSteps;
 };
 
+// struct pres
+// {
+//     float preFactor = 0.0f; // Numerical prefactor
+//     int q2n = 0;            // Powers of laplacian
+//     int iqx = 0;            // x-derivatives (contains i)
+//     int iqy = 0;            // y-derivatives (contains i)
+//     int invq = 0;           // 1/|q| powers
+// };
+
 struct pres
 {
     float preFactor = 0.0f; // Numerical prefactor
     int q2n = 0;            // Powers of laplacian
     int iqx = 0;            // x-derivatives (contains i)
     int iqy = 0;            // y-derivatives (contains i)
+    int iqz = 0;
     int invq = 0;           // 1/|q| powers
 };
 

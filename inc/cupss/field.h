@@ -21,9 +21,9 @@ class evolver;
 class field
 {
     private:
-    const int sx, sy;
-    const float dx, dy;
-    const float stepqx, stepqy;
+    const int sx, sy, sz;
+    const float dx, dy, dz;
+    const float stepqx, stepqy, stepqz;
 
     fftwf_plan plan_forward;
     fftwf_plan plan_backward;
@@ -41,7 +41,10 @@ class field
 
 
     public:
+    field(int, float);
     field(int, int, float, float);
+    field(int, int, int, float, float, float);
+    void common_constructor();
 
     std::string name;
 
@@ -104,7 +107,7 @@ class field
 
     // callback functions 
     bool hasCB;
-    void (*callback) (evolver *, float2 *, int, int);
+    void (*callback) (evolver *, float2 *, int, int, int);
 
     dim3 threads_per_block;
     dim3 blocks;
