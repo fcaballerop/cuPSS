@@ -162,6 +162,7 @@ float parser::is_numerical_factor(const std::string &factor)
     if (is_q2n_factor(factor)) return 1.0f;
     if (is_iq_factor(factor, "iqx")) return 1.0f;
     if (is_iq_factor(factor, "iqy")) return 1.0f;
+    if (is_iq_factor(factor, "iqz")) return 1.0f;
     if (is_iq_factor(factor, "1/q")) return 1.0f;
     if (is_field(factor)) return 1.0f;
 
@@ -383,7 +384,7 @@ pres parser::add_noise(const std::string &_equation)
     std::vector<std::string> factors;
     get_factors(equation, factors);
 
-    pres prefactor = {1.0f, 0, 0, 0, 0};
+    pres prefactor = {1.0f, 0, 0, 0, 0, 0};
 
     for (int i = 0; i < factors.size(); i++)
     {
@@ -539,7 +540,7 @@ int parser::expand_all(std::vector<std::string> &terms)
 pres parser::get_prefactor(std::string _term)
 {
     std::string term = _term;
-    pres prefactor = {1.0f, 0, 0, 0, 0};
+    pres prefactor = {1.0f, 0, 0, 0, 0, 0};
     if (term[0] == '+')
     {
         term = term.substr(1);
@@ -563,6 +564,7 @@ pres parser::get_prefactor(std::string _term)
             prefactor.q2n += is_q2n_factor(factors[i])/2;
             prefactor.iqx += is_iq_factor(factors[i], "iqx");
             prefactor.iqy += is_iq_factor(factors[i], "iqy");
+            prefactor.iqz += is_iq_factor(factors[i], "iqz");
             prefactor.invq += is_iq_factor(factors[i], "1/q");
         }
     }
@@ -696,7 +698,7 @@ int parser::add_equation(const std::string &_equation)
         }
     }
 
-    if (!(implicits.size() == 1 && implicits[0].preFactor == 1.0f && implicits[0].q2n == 0 && implicits[0].iqx == 0 && implicits[0].iqy == 0 && implicits[0].invq == 0))
+    if (!(implicits.size() == 1 && implicits[0].preFactor == 1.0f && implicits[0].q2n == 0 && implicits[0].iqx == 0 && implicits[0].iqy == 0 && implicits[0].iaz == 0 && implicits[0].invq == 0))
     {
         for (int i = 0; i < implicits.size(); i++)
         {

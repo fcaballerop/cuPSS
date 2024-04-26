@@ -32,9 +32,9 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define NX 32
-#define NY 32
-#define NZ 32
+#define NX 60
+#define NY 40
+#define NZ 30
 
 int main(int argc, char **argv)
 {
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     std::cout << "Preparing problem\n";
     system.prepareProblem();
 
-    int steps = 1000000;
+    int steps = 100000;
     int check = steps/100;
     if (check < 1) check = 1;
     
