@@ -698,7 +698,7 @@ int parser::add_equation(const std::string &_equation)
         }
     }
 
-    if (!(implicits.size() == 1 && implicits[0].preFactor == 1.0f && implicits[0].q2n == 0 && implicits[0].iqx == 0 && implicits[0].iqy == 0 && implicits[0].iaz == 0 && implicits[0].invq == 0))
+    if (!(implicits.size() == 1 && implicits[0].preFactor == 1.0f && implicits[0].q2n == 0 && implicits[0].iqx == 0 && implicits[0].iqy == 0 && implicits[0].iqz == 0 && implicits[0].invq == 0))
     {
         for (int i = 0; i < implicits.size(); i++)
         {
