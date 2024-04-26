@@ -32,14 +32,14 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define NX 64
-#define NY 64
-#define NZ 64
+#define NX 32
+#define NY 32
+#define NZ 32
 
 int main(int argc, char **argv)
 {
     std::cout << "Creating evolver\n";
-    evolver system(1, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.001f, 1);
+    evolver system(1, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.01f, 100);
 
     std::cout << "Creating field\n";
     system.createField("phi", true);        // 0
@@ -47,12 +47,12 @@ int main(int argc, char **argv)
 
     // Terms for field phi
     std::cout << "Creating term\n";
-    // system.createTerm("phi", {{-1.0f, 1, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
-    system.createTerm("cube", {{1.0f, 0, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
+    system.createTerm("phi", {{-1.0f, 1, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
+    system.createTerm("cube", {{1.0f, 1, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
 
     std::cout << "Creating implicits\n";
-    // system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0, 0});
-    // system.fields[0]->implicit.push_back({-4.0f, 2, 0, 0, 0, 0});
+    system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0, 0});
+    system.fields[0]->implicit.push_back({-4.0f, 2, 0, 0, 0, 0});
 
     // Random initial state
     std::srand(1324);
@@ -64,8 +64,9 @@ int main(int argc, char **argv)
             for (int i = 0; i < NX; i++)
             {
                 int index = k * NX * NY + j * NX + i;
-                // system.fields[0]->real_array[index].x = 0.0001f * (float)(rand()%200-100);
                 system.fieldsReal["phi"][index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f)+ ((float)k - (float)NZ/2.0f)*((float)k - (float)NZ/2.0f))/(0.01f * (float)(NX*NX*NX)));
+                system.fields[0]->real_array[index].x = 0.0001f * (float)(rand()%200-100);
+                // system.fieldsReal["phi"][index].x = 3.0f;
             }
         }
     }
@@ -73,7 +74,7 @@ int main(int argc, char **argv)
     std::cout << "Preparing problem\n";
     system.prepareProblem();
 
-    int steps = 3;
+    int steps = 1000000;
     int check = steps/100;
     if (check < 1) check = 1;
     
@@ -83,11 +84,11 @@ int main(int argc, char **argv)
     for (int i = 0; i < steps; i++)
     {
         system.advanceTime();
-        // if (i % check == 0)
-        // {
-        //     std::cout << "Progress: " << i/check << "%\r";
-        //     std::cout.flush();
-        // }
+        if (i % check == 0)
+        {
+            std::cout << "Progress: " << i/check << "%\r";
+            std::cout.flush();
+        }
     }
 
     return 0;
