@@ -84,7 +84,6 @@ where $L(k)$ can be a constant or a power of wavelength $k$, allowing for severa
 ## What it does not support (yet)
 
  - Correlated noise.
- - 3D systems.
  - Compilable without CUDA so that it can run only on CPU.
  - Option for double precision integration.
 
