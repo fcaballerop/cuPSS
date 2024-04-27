@@ -32,23 +32,21 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define NX 60
-#define NY 40
-#define NZ 30
+#define NX 256
+#define NY 256
+#define NZ 256
 
 int main(int argc, char **argv)
 {
     std::cout << "Creating evolver\n";
-    evolver system(1, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.01f, 100);
+    evolver system(1, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.1f, 1000);
 
     std::cout << "Creating field\n";
     system.createField("phi", true);        // 0
-    system.createField("cube", false);        // 0
-
+                                            //
     // Terms for field phi
     std::cout << "Creating term\n";
     system.createTerm("phi", {{-1.0f, 1, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
-    system.createTerm("cube", {{1.0f, 1, 0, 0, 0, 0}}, {"phi", "phi", "phi"});
 
     std::cout << "Creating implicits\n";
     system.fields[0]->implicit.push_back({1.0f, 1, 0, 0, 0, 0});
@@ -74,7 +72,7 @@ int main(int argc, char **argv)
     std::cout << "Preparing problem\n";
     system.prepareProblem();
 
-    int steps = 100000;
+    int steps = 10000;
     int check = steps/100;
     if (check < 1) check = 1;
     
