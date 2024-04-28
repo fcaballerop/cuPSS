@@ -34,7 +34,7 @@ int field::setRHS(float dt)
         if (!dynamic)
         {
             setNotDynamic_gpu(terms_d, terms.size(), implicit_terms, implicit.size(), 
-                    comp_array_d, sx, sy, sz, stepqx, stepqy, stepqz, precomp_implicit_d, blocks, threads_per_block);
+                    comp_array_d, sx, sy, sz, stepqx, stepqy, stepqz, precomp_implicit_d, isNoisy, noise_fourier, precomp_noise_d, dt, blocks, threads_per_block);
         }
         else 
         {
@@ -47,7 +47,7 @@ int field::setRHS(float dt)
     {
         if (!dynamic)
         {
-            setNotDynamic();
+            setNotDynamic(dt);
         }
         else
         {
@@ -94,8 +94,11 @@ int field::setRHS(float dt)
     return 0;
 }
 
-void field::setNotDynamic()
+void field::setNotDynamic(float dt)
 {
+    float sdt = 0.0f;
+    if (isNoisy)
+        sdt = 1.0f / std::sqrt(dt);
     for (int k = 0; k < sz; k++)
     {
         for (int j = 0; j < sy; j++)
@@ -114,6 +117,19 @@ void field::setNotDynamic()
                     {
                         comp_array[index].x += terms[term]->term_comp[index].x;
                         comp_array[index].y += terms[term]->term_comp[index].y;
+                    }
+                }
+                if (isNoisy)
+                {
+                    if (terms.size() == 0)
+                    {
+                        comp_array[index].x = sdt * precomp_noise[index] * noise_comp[index].x;
+                        comp_array[index].y = sdt * precomp_noise[index] * noise_comp[index].y;
+                    }
+                    else 
+                    {
+                        comp_array[index].x += sdt * precomp_noise[index] * noise_comp[index].x;
+                        comp_array[index].y += sdt * precomp_noise[index] * noise_comp[index].y;
                     }
                 }
                 if (implicit.size() > 0 && index != 0) // last condition easy fix for q=0 case
@@ -182,16 +198,16 @@ void field::stepEuler(float dt)
                     comp_array[index].x += dt * terms[term]->term_comp[index].x;
                     comp_array[index].y += dt * terms[term]->term_comp[index].y;
                 }
+                if (isNoisy)
+                {
+                    comp_array[index].x += precomp_noise[index] * noise_comp[index].x;
+                    comp_array[index].y += precomp_noise[index] * noise_comp[index].y;
+                }
                 // After adding all explicit terms, we divide over the implicits
                 if (implicit.size() > 0)
                 {
                     comp_array[index].x /= precomp_implicit[index];
                     comp_array[index].y /= precomp_implicit[index];
-                }
-                if (isNoisy)
-                {
-                    comp_array[index].x += precomp_noise[index] * noise_comp[index].x;
-                    comp_array[index].y += precomp_noise[index] * noise_comp[index].y;
                 }
             }
         }

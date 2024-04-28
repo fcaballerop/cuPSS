@@ -4,7 +4,7 @@
 #include <cuda_runtime.h>
 #include "defines.h"
 
-extern "C" void setNotDynamic_gpu(float2 **, int , pres *, int , float2 *, int , int , int, float , float, float, float * , dim3, dim3);
+extern "C" void setNotDynamic_gpu(float2 **, int , pres *, int , float2 *, int , int , int, float , float, float, float * , bool, float2 *, float *, float, dim3, dim3);
 
 extern "C" void setDynamic_gpu(float2 **, int , pres *, int , float2 *, int , int , int, float, float , float , float, float *, bool, float2 *, float *, dim3, dim3);
 
@@ -18,7 +18,7 @@ extern "C" void copyToFloat2_gpu(float *, float2 *, int , int , int, dim3, dim3)
 
 extern "C" void correctNoiseAmplitude_gpu(float2 *, float *, int , int , int, dim3, dim3);
 
-__global__ void setNotDynamic_k(float2 **, int , pres *, int , float2 *, int , int , int, float, float , float, float *);
+__global__ void setNotDynamic_k(float2 **, int , pres *, int , float2 *, int , int , int, float, float , float, float *, bool, float2 *, float *, float);
 
 __global__ void setDynamic_k(float2 **, int , pres *, int , float2 *, int , int , int, float, float , float , float , float *, bool, float2 *, float *);
 

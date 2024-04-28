@@ -6,6 +6,7 @@ endif()
 
 project(cuPSS LANGUAGES CXX CUDA)
 
+
 add_library(cupss STATIC
     src/evolver.cu
     src/field.cu
@@ -16,6 +17,7 @@ add_library(cupss STATIC
     src/term_init.cu
     src/term_kernels.cu
     )
+set_property(TARGET cupss PROPERTY CUDA_ARCHITECTURES OFF)
 
 INSTALL(TARGETS cupss
     LIBRARY DESTINATION /usr/lib/

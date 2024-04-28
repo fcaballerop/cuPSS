@@ -116,7 +116,7 @@ class field
     int updateTerms();
     void createNoise();
     void setToZero();
-    void setNotDynamic();
+    void setNotDynamic(float);
     void setDynamic(float);
 
     void stepEuler(float);

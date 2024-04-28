@@ -3,9 +3,9 @@
 
 #include "../inc/cupss/field_kernels.cuh"
 
-extern "C" void setNotDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, int sz, float stepqx, float stepqy, float stepqz, float *precomp, dim3 blocks, dim3 threadsPerBlock)
+extern "C" void setNotDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, int sz, float stepqx, float stepqy, float stepqz, float *precomp, bool isNoisy, float2 *noise, float *precomp_noise, float dt, dim3 blocks, dim3 threadsPerBlock)
 {
-    setNotDynamic_k<<<blocks, threadsPerBlock>>>(terms, len, implicits, i_len, out, sx, sy, sz, stepqx, stepqy, stepqz, precomp);
+    setNotDynamic_k<<<blocks, threadsPerBlock>>>(terms, len, implicits, i_len, out, sx, sy, sz, stepqx, stepqy, stepqz, precomp, isNoisy, noise, precomp_noise, dt);
 }
 
 extern "C" void setDynamic_gpu(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, int sz, float stepqx, float stepqy, float stepqz, float dt, float *precomp, bool isNoisy, float2 *noise_r, float* precomp_noise, dim3 blocks, dim3 threadsPerBlock)
@@ -127,7 +127,7 @@ __global__ void normalize_k(float2 *array, int sx, int sy, int sz)
     }
 }
 
-__global__ void setNotDynamic_k(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, int sz, float stepqx, float stepqy, float stepqz, float *precomp)
+__global__ void setNotDynamic_k(float2 **terms, int len, pres *implicits, int i_len, float2 *out, int sx, int sy, int sz, float stepqx, float stepqy, float stepqz, float *precomp, bool isNoisy, float2 *noise, float *precomp_noise, float dt)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     int j = blockIdx.y * blockDim.y + threadIdx.y;
@@ -148,6 +148,20 @@ __global__ void setNotDynamic_k(float2 **terms, int len, pres *implicits, int i_
             {
                 out[index].x += terms[t][index].x;
                 out[index].y += terms[t][index].y;
+            }
+        }
+        if (isNoisy)
+        {
+            float sdt = 1.0f / sqrt(dt);
+            if (len == 0)
+            {
+                out[index].x = sdt * precomp_noise[index] * noise[index].x;
+                out[index].y = sdt * precomp_noise[index] * noise[index].y;
+            }
+            else 
+            {
+                out[index].x += sdt * precomp_noise[index] * noise[index].x;
+                out[index].y += sdt * precomp_noise[index] * noise[index].y;
             }
         }
         if (i_len > 0 && index > 0)
@@ -197,6 +211,12 @@ __global__ void setDynamic_k(float2 **terms, int len, pres *implicits, int i_len
             out[index].x += dt * terms[t][index].x;
             out[index].y += dt * terms[t][index].y;
         }
+        if (isNoisy)
+        {
+            // includes sqrt(dt) in the precomp_noise
+            out[index].x += precomp_noise[index] * noise[index].x;
+            out[index].y += precomp_noise[index] * noise[index].y;
+        }
         // Now implicit terms
         if (i_len > 0)
         {
@@ -223,12 +243,6 @@ __global__ void setDynamic_k(float2 **terms, int len, pres *implicits, int i_len
             // out[index].y /= implicitFactor;
             out[index].x /= precomp[index];
             out[index].y /= precomp[index];
-        }
-        if (isNoisy)
-        {
-            // includes sqrt(dt) in the precomp_noise
-            out[index].x += precomp_noise[index] * noise[index].x;
-            out[index].y += precomp_noise[index] * noise[index].y;
         }
     }
 }
