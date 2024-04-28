@@ -55,6 +55,7 @@ public:
 
     void test();
 
+    int writePrecision;
     void writeOut();
 
     void printInformation();

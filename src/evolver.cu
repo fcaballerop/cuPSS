@@ -42,6 +42,7 @@ void evolver::common_constructor()
         blocks = dim3(bx,by,bz);
     }
 
+    writePrecision = 6;
     _parser = new parser(this);
 }
 
@@ -256,6 +257,7 @@ void evolver::writeOut()
             std::string fileName = "data/" + fields[f]->name + ".csv." + std::to_string(currentTimeStep);
             fp = fopen(fileName.c_str(), "w+");
             fprintf(fp, "x, y, z, %s\n", fields[f]->name.c_str());
+            std::string outFormat = "%i, %i, %i, %." + std::to_string(writePrecision) + "f\n";
             for (int k = 0; k < sz; k++)
             {
                 for (int j = 0; j < sy; j++)
@@ -263,7 +265,7 @@ void evolver::writeOut()
                     for (int i = 0; i < sx; i++)
                     {
                         int index = k * sx * sy + j * sx + i;
-                        fprintf(fp, "%i, %i, %i, %f\n", i, j, k, fields[f]->real_array[index].x);
+                        fprintf(fp, outFormat.c_str(), i, j, k, fields[f]->real_array[index].x);
                     }
                 }
             }
