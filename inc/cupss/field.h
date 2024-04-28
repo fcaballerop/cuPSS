@@ -108,6 +108,8 @@ class field
     // callback functions 
     bool hasCB;
     void (*callback) (evolver *, float2 *, int, int, int);
+    bool hasCBFourier;
+    void (*callbackFourier) (evolver *, float2 *, int, int, int);
 
     dim3 threads_per_block;
     dim3 blocks;

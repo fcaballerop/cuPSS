@@ -55,6 +55,17 @@ int field::setRHS(float dt)
         }
     }
     
+    if (hasCBFourier)
+    {
+        if (callbackFourier == NULL)
+            std::cout << "Wants to apply callback function in Fourier space but pointer to function is NULL" << std::endl;
+        else {
+            if ( isCUDA )
+                callbackFourier(system_p, comp_array_d, sx, sy, sz);
+            else 
+                callbackFourier(system_p, comp_array, sx, sy, sz);
+        }
+    }
     // dealiasing
     if (needsaliasing)
     {
