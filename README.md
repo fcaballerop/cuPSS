@@ -7,7 +7,7 @@
   <p align="center">
     A pseudospectral solver for systems of stochastics PDEs written in C++ & CUDA
     <br />
-    <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>Read the docs »</strong></a>
+    <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>Read the wiki »</strong></a>
     <br />
     <br />
   </p>
