@@ -481,3 +481,51 @@ void evolver::copyAllDataToHost()
         // cudaMemcpy(fields[i]->comp_array, fields[i]->comp_array_d, sx*sy*sizeof(float2), cudaMemcpyDeviceToHost);
     }
 }
+
+void evolver::initializeUniform(std::string field, float value)
+{
+    bool found = false;
+    for (int i = 0; i < fields.size(); i++)
+        if (field == fields[i]->name)
+            found = true;
+    if (!found)
+    {
+        std::cout << "ERROR in initialize uniform, " << field << " not found" << std::endl;
+        return;
+    }
+    for (int k = 0; k < sz; k++)
+    {
+        for (int j = 0; j < sy; j++)
+        {
+            for (int i = 0; i < sx; i++)
+            {
+                int index = k * sx * sy + j * sx + i;
+                fieldsMap[field]->real_array[index].x = value;
+            }
+        }
+    }
+}
+
+void evolver::initializeUniform(std::string field, float value)
+{
+    bool found = false;
+    for (int i = 0; i < fields.size(); i++)
+        if (field == fields[i]->name)
+            found = true;
+    if (!found)
+    {
+        std::cout << "ERROR in initialize uniform, " << field << " not found" << std::endl;
+        return;
+    }
+    for (int k = 0; k < sz; k++)
+    {
+        for (int j = 0; j < sy; j++)
+        {
+            for (int i = 0; i < sx; i++)
+            {
+                int index = k * sx * sy + j * sx + i;
+                fieldsMap[field]->real_array[index].x = value;
+            }
+        }
+    }
+}

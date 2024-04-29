@@ -65,6 +65,9 @@ public:
     void prepareProblem();
 
     void setOutputField(std::string, int);
+
+    void initializeUniform(std::string, float);
+    void initializeUniformNoise(std::string, float);
 };
 
 #endif // EVOLVER_H
