@@ -490,8 +490,8 @@ void evolver::initializeUniform(std::string field, float value)
             found = true;
     if (!found)
     {
-        std::cout << "ERROR in initialize uniform, " << field << " not found" << std::endl;
-        return;
+       std::cout << "ERROR in initialize uniform, " << field << " not found" << std::endl;
+       std::exit(1);
     }
     for (int k = 0; k < sz; k++)
     {
@@ -506,7 +506,7 @@ void evolver::initializeUniform(std::string field, float value)
     }
 }
 
-void evolver::initializeUniform(std::string field, float value)
+void evolver::initializeUniformNoise(std::string field, float value)
 {
     bool found = false;
     for (int i = 0; i < fields.size(); i++)
@@ -515,7 +515,7 @@ void evolver::initializeUniform(std::string field, float value)
     if (!found)
     {
         std::cout << "ERROR in initialize uniform, " << field << " not found" << std::endl;
-        return;
+        std::exit(1);
     }
     for (int k = 0; k < sz; k++)
     {
@@ -524,7 +524,7 @@ void evolver::initializeUniform(std::string field, float value)
             for (int i = 0; i < sx; i++)
             {
                 int index = k * sx * sy + j * sx + i;
-                fieldsMap[field]->real_array[index].x = value;
+                fieldsMap[field]->real_array[index].x = value * 0.01f * (float)(rand()%200-100);
             }
         }
     }

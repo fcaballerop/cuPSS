@@ -145,6 +145,7 @@ int parser::is_number(const std::string &term)
     if (has_period > 1)
     {
         std::cout << "ERROR: prefactor not a parameter and not a number: " << term << std::endl;
+        std::exit(1);
     }
     if (has_period)
         to_test.erase(period_ind,1);
@@ -194,6 +195,7 @@ float parser::is_numerical_factor(const std::string &factor)
     else
     {
         std::cout << "ERROR, parameter not found and not a number: " << factor << std::endl;
+        std::exit(1);
     }
     return 1.0f;
 }
@@ -413,7 +415,7 @@ int parser::split_equation_sides(std::string input, std::string &lhs, std::strin
         std::cout << "Error processing" << std::endl;
         std::cout << input << std::endl;
         std::cout << "More than one equal sign" << std::endl;
-        return -1;
+        std::exit(1);
     }
     lhs = input.substr(0,equal_pos);
     if (equal_pos == input.size()-1)
@@ -481,8 +483,8 @@ int parser::expand_once(std::string input, std::vector<std::string> &terms)
         {
             if (pointer > 0 && input[pointer-1] == '/')
             {
-                std::cout << "No dividing over parenthesis!" << std::endl;
-                return -1;
+                std::cout << "ERROR: No dividing over parenthesis allowed!" << std::endl;
+                std::exit(1);
             }
             par_found = 1;
             par_level++;
@@ -630,12 +632,12 @@ int parser::add_equation(const std::string &_equation)
         if (!is_field(field_name))
         {
             std::cout << "Field not found: " << field_name << "\n";
-            return -1;
+            std::exit(1);
         }
         if (is_field(field_name) > 1)
         {
             std::cout << "Nonlinearity in lhs: " << field_name << "\n";
-            return -1;
+            std::exit(1);
         }
         lhs_terms.erase(lhs_terms.begin());
     }
@@ -645,7 +647,7 @@ int parser::add_equation(const std::string &_equation)
         {
             std::cout << "ERROR: Nonlinear term in left hand side: " << number_of_fields(lhs_terms[1]) << std::endl;
             std::cout << lhs_terms[0] << std::endl;
-            return -1;
+            std::exit(1);
         }
         field_name = get_field_name(lhs_terms[0]);
     }
@@ -658,12 +660,12 @@ int parser::add_equation(const std::string &_equation)
         if (fields.size() != 1)
         {
             std::cout << "Nonlinear term in lhs\n";
-            return -1;
+            std::exit(1);
         }
         if (fields[0] != field_name)
         {
             std::cout << "ERROR: " << field_name << " and " << fields[0] << " incompatible in lhs\n";
-            return -1;
+            std::exit(1);
         }
         pres this_prefactor = get_prefactor(lhs_terms[i]);
         if (dynamic == 1) this_prefactor.preFactor *= -1.0f;
@@ -708,8 +710,8 @@ int parser::add_equation(const std::string &_equation)
 
     if (prefactor_vector.size() != fields_vector.size())
     {
-        std::cout << "Error processing equation\n";
-        return -1;
+        std::cout << "ERROR: Inconsistent number of prefactors and fields\n";
+        std::exit(1);
     }
     for (int i = 0; i < fields_vector.size(); i++)
     {
