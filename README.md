@@ -63,7 +63,12 @@ The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located.
 ```
 The solver outputs data by default to a directory called `data` from where it's called. The output files contain raw data of the states of the field at each timestep at which they're written out.
 
-<img src="img/modelb.gif" alt="Model B">
+
+These two images are the results of a Cahn-Hilliard solver in 2D and 3D, available in the examples.
+<div align="center">
+    <img src="img/CH2D.gif" width=220 height=200>
+    <img src="img/CH3D.gif" width=220 height=200>
+</div>
 
 ## What it calculates
 See <a href=""><strong>here</strong></a>.
