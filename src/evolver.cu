@@ -256,6 +256,11 @@ void evolver::writeOut()
             // sprintf(fileName, "data/%s.csv.%i",fields[k]->name.c_str(), currentTimeStep);
             std::string fileName = "data/" + fields[f]->name + ".csv." + std::to_string(currentTimeStep);
             fp = fopen(fileName.c_str(), "w+");
+            if (fp == NULL)
+            {
+                std::cout << "Error creating output file at timestep " << currentTimeStep << std::endl;
+                std::exit(1);
+            }
             fprintf(fp, "x, y, z, %s\n", fields[f]->name.c_str());
             std::string outFormat = "%i, %i, %i, %." + std::to_string(writePrecision) + "f\n";
             for (int k = 0; k < sz; k++)
@@ -265,7 +270,12 @@ void evolver::writeOut()
                     for (int i = 0; i < sx; i++)
                     {
                         int index = k * sx * sy + j * sx + i;
-                        fprintf(fp, outFormat.c_str(), i, j, k, fields[f]->real_array[index].x);
+                        int bytesWritten = fprintf(fp, outFormat.c_str(), i, j, k, fields[f]->real_array[index].x);
+                        if (bytesWritten < 0)
+                        {
+                            std::cout << "Error writing data to output file at timestep " << currentTimeStep << std::endl;
+                            std::exit(1);
+                        }
                     }
                 }
             }
