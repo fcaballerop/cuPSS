@@ -20,11 +20,13 @@ void evolver::common_constructor()
     {
         if (sy == 1)
         {
+            dimension = 1;
             blocks = 1;
             threads_per_block = sx;
         }
         else 
         {
+            dimension = 2;
             threads_per_block = dim3(32,32);
             int bx = (sx+31)/32;
             int by = (sy+31)/32;
@@ -34,6 +36,7 @@ void evolver::common_constructor()
     }
     else 
     {
+        dimension = 3;
         threads_per_block = dim3(16, 8, 8);
         int bx = (sx+15)/16;
         int by = (sy+7)/8;
@@ -261,8 +264,19 @@ void evolver::writeOut()
                 std::cout << "Error creating output file at timestep " << currentTimeStep << std::endl;
                 std::exit(1);
             }
-            fprintf(fp, "x, y, z, %s\n", fields[f]->name.c_str());
-            std::string outFormat = "%i, %i, %i, %." + std::to_string(writePrecision) + "f\n";
+            std::string outFormat = "%i, ";
+            if (dimension == 1) {
+                fprintf(fp, "x, %s\n", fields[f]->name.c_str());
+            }
+            if (dimension == 2) {
+                outFormat += "%i, ";
+                fprintf(fp, "x, y, %s\n", fields[f]->name.c_str());
+            }
+            if (dimension == 3) {
+                outFormat += "%i, %i, ";
+                fprintf(fp, "x, y, z, %s\n", fields[f]->name.c_str());
+            }
+            outFormat += "%." + std::to_string(writePrecision) + "f\n";
             for (int k = 0; k < sz; k++)
             {
                 for (int j = 0; j < sy; j++)
@@ -270,7 +284,13 @@ void evolver::writeOut()
                     for (int i = 0; i < sx; i++)
                     {
                         int index = k * sx * sy + j * sx + i;
-                        int bytesWritten = fprintf(fp, outFormat.c_str(), i, j, k, fields[f]->real_array[index].x);
+                        int bytesWritten = 0;
+                        if (dimension == 1)
+                            bytesWritten = fprintf(fp, outFormat.c_str(), i, fields[f]->real_array[index].x);
+                        if (dimension == 2)
+                            bytesWritten = fprintf(fp, outFormat.c_str(), i, j, fields[f]->real_array[index].x);
+                        if (dimension == 3)
+                            bytesWritten = fprintf(fp, outFormat.c_str(), i, j, k, fields[f]->real_array[index].x);
                         if (bytesWritten < 0)
                         {
                             std::cout << "Error writing data to output file at timestep " << currentTimeStep << std::endl;

@@ -19,6 +19,7 @@ private:
     const int writeEveryNSteps;
     parser *_parser;
 public:
+    int dimension;
     dim3 threads_per_block;
     dim3 blocks;
     float dt;
