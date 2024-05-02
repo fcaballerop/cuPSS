@@ -18,14 +18,7 @@ int main(int argc, char **argv)
     system.addParameter("k", 4.0f);
 
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 ");
-    for (int j = 0; j < NY; j++)
-    {
-        for (int i = 0; i < NX; i++)
-        {
-            int index = j * NX + i;
-            system.fieldsMap["phi"]->real_array[index].x = 0.001f * (float)(rand()%200-100);
-        }
-    }
+    system.initializeUniformNoise("phi", 0.01);
 
     system.prepareProblem();
 
