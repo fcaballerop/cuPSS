@@ -18,6 +18,7 @@ int main(int argc, char **argv)
     system.addParameter("k", 4.0f);
 
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 ");
+
     system.initializeUniformNoise("phi", 0.01);
 
     system.prepareProblem();
