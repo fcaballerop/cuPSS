@@ -153,6 +153,8 @@ void field::common_constructor()
     // callback functions
     hasCB = false;
     callback = NULL;
+    hasCBFourier = false;
+    callbackFourier = NULL;
 
     // noise
     isNoisy = false;
