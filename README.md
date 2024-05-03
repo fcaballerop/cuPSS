@@ -11,6 +11,8 @@
     <br />
     <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>Read the wiki »</strong></a>
     <br />
+    <a href="https://github.com/fcaballerop/cuPSS/wiki/Tutorials"><strong>Read the tutorials »</strong></a>
+    <br />
     <br />
   </p>
 </div>
