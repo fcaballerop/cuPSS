@@ -244,29 +244,10 @@ void evolver::printInformation()
     std::cout << std::fixed;
     std::cout << std::setprecision(3);
     std::cout << "Information on this evolver:" << std::endl;
-    if (sz == 1)
-    {
-        if (sy == 1)
-        {
-            std::cout << "1-dimensional system of size N = " << sx << "." << std::endl;
-            std::cout << "Physical size L = " << (float)sx*dx
-                << " with cells of size dx = " << dx << std::endl;
-        }
-        else 
-        {
-            std::cout << "2-dimensional system of size " << sx << "x" << sy << std::endl;
-            std::cout << "Physical size " << (float)sx*dx << "x"
-                << (float)sy*dy << " with cells of size " 
-                << dx << "x" << dy << std::endl;
-        }
-    }
-    else 
-    {
-        std::cout << "3-dimensional system of size " << sx << "x" << sy << "x" << sz << std::endl;
-        std::cout << "Physical size " << (float)sx*dx << "x"
-            << (float)sy*dy << "x" << (float)sz*dz << " with cells of size " 
-            << dx << "x" << dy << "x" << dz << std::endl;
-    }
+    std::cout << dimension << "-dimensional system of size " << sx << "x" << sy << "x" << sz << std::endl;
+    std::cout << "Physical size " << (float)sx*dx << "x"
+        << (float)sy*dy << "x" << (float)sz*dz << " with cells of size " 
+        << dx << "x" << dy << "x" << dz << std::endl;
     std::cout << "There are " << fields.size() << " fields." << std::endl;
     for (int i = 0; i < fields.size(); i++)
     {
@@ -300,7 +281,7 @@ void evolver::printInformation()
                 if (fields[i]->implicit[j].iqz != 0)
                     implicitLine += "(iqz)^(" + std::to_string(fields[i]->implicit[j].iqz) + ")";
                 if (fields[i]->implicit[j].q2n != 0)
-                    implicitLine += "(q^2)^(" + std::to_string(fields[i]->implicit[j].q2n) + ")";
+                    implicitLine += "(q)^(" + 2*std::to_string(fields[i]->implicit[j].q2n) + ")";
                 if (fields[i]->implicit[j].invq != 0)
                     implicitLine += "(1/|q|)^(" + std::to_string(fields[i]->implicit[j].invq) + ")";
             }
@@ -326,7 +307,7 @@ void evolver::printInformation()
                 if (fields[i]->terms[j]->prefactors_h[p].iqz != 0)
                     line += "(iqz)^(" + std::to_string(fields[i]->terms[j]->prefactors_h[p].iqz) + ")";
                 if (fields[i]->terms[j]->prefactors_h[p].q2n != 0)
-                    line += "(q^2)^(" + std::to_string(fields[i]->terms[j]->prefactors_h[p].q2n) + ")";
+                    line += "(q)^(" +2* std::to_string(fields[i]->terms[j]->prefactors_h[p].q2n) + ")";
                 if (fields[i]->terms[j]->prefactors_h[p].invq != 0)
                     line += "(1/|q|)^(" + std::to_string(fields[i]->terms[j]->prefactors_h[p].invq) + ")";
                 if (p != fields[i]->terms[j]->prefactors_h.size()-1)
