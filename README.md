@@ -2,7 +2,7 @@
 <div align="center">
     <img src="img/noisy_gaussian.jpg" width=156 height=160>
 
-  <h3 align="center">cuPPS</h3>
+  <h3 align="center">cuPSS</h3>
 
   <p align="center">
     A pseudospectral solver for systems of stochastics PDEs written in C++ & CUDA
