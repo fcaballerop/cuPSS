@@ -91,8 +91,6 @@ $$\langle\tilde\eta_i(k,\omega)\eta_j(k',\omega')\rangle = 2L(k)\delta(k+k')\del
 where $L(k)$ can be a constant or a power of wavelength $k$, allowing for several types of noise.
 
 ## What it does not support (yet)
-
- - Correlated noise.
  - Compilable without CUDA so that it can run only on CPU.
  - Option for double precision integration.
 
