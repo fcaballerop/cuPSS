@@ -130,6 +130,13 @@ class field
     void normalize();
     void dealias();
 
+    void copyHostToDevice();
+    void copyDeviceToHost();
+    void copyRealHostToDevice();
+    void copyRealDeviceToHost();
+
+    void writeToFile(int , int , int );
+
     void prepareDevice();
 
     void precalculateImplicit(float dt);

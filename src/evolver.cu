@@ -99,8 +99,7 @@ void evolver::prepareProblem()
     // copy host to device to account for initial conditions
     for (int i = 0; i < fields.size(); i++)
     {
-        cudaMemcpy(fields[i]->real_array_d, fields[i]->real_array, sx*sy*sz*sizeof(float2), cudaMemcpyHostToDevice);
-        cudaMemcpy(fields[i]->comp_array_d, fields[i]->comp_array, sx*sy*sz*sizeof(float2), cudaMemcpyHostToDevice);
+        fields[i]->copyHostToDevice();
         fields[i]->toComp();
     }
     // for each field prepare device and precalculate implicits
@@ -232,75 +231,11 @@ int evolver::advanceTime()
     return 0;
 }
 
-void evolver::test()
-{
-    std::cout << "With cuda " << with_cuda << std::endl;
-}
-
 void evolver::writeOut()
 {
-    if (with_cuda)
-    {
-        copyAllDataToHost();
-    }
-    // check for NaNs (not checked if no output)
-    float c1 = fields[0]->real_array[0].x;
-    if (c1 != c1)
-    {
-        std::cout << "NaN detected, exiting!" << std::endl;
-        std::exit(-1);
-    }
     for (int f = 0; f < fields.size(); f++)
     {
-        if (fields[f]->outputToFile)
-        {
-            FILE *fp;
-            // char *fileName = new char[50];
-            // sprintf(fileName, "data/%s.csv.%i",fields[k]->name.c_str(), currentTimeStep);
-            std::string fileName = "data/" + fields[f]->name + ".csv." + std::to_string(currentTimeStep);
-            fp = fopen(fileName.c_str(), "w+");
-            if (fp == NULL)
-            {
-                std::cout << "Error creating output file at timestep " << currentTimeStep << std::endl;
-                std::exit(1);
-            }
-            std::string outFormat = "%i, ";
-            if (dimension == 1) {
-                fprintf(fp, "x, %s\n", fields[f]->name.c_str());
-            }
-            if (dimension == 2) {
-                outFormat += "%i, ";
-                fprintf(fp, "x, y, %s\n", fields[f]->name.c_str());
-            }
-            if (dimension == 3) {
-                outFormat += "%i, %i, ";
-                fprintf(fp, "x, y, z, %s\n", fields[f]->name.c_str());
-            }
-            outFormat += "%." + std::to_string(writePrecision) + "f\n";
-            for (int k = 0; k < sz; k++)
-            {
-                for (int j = 0; j < sy; j++)
-                {
-                    for (int i = 0; i < sx; i++)
-                    {
-                        int index = k * sx * sy + j * sx + i;
-                        int bytesWritten = 0;
-                        if (dimension == 1)
-                            bytesWritten = fprintf(fp, outFormat.c_str(), i, fields[f]->real_array[index].x);
-                        if (dimension == 2)
-                            bytesWritten = fprintf(fp, outFormat.c_str(), i, j, fields[f]->real_array[index].x);
-                        if (dimension == 3)
-                            bytesWritten = fprintf(fp, outFormat.c_str(), i, j, k, fields[f]->real_array[index].x);
-                        if (bytesWritten < 0)
-                        {
-                            std::cout << "Error writing data to output file at timestep " << currentTimeStep << std::endl;
-                            std::exit(1);
-                        }
-                    }
-                }
-            }
-            fclose(fp);
-        }
+        fields[f]->writeToFile(currentTimeStep, dimension, writePrecision);
     }
 }
 
@@ -418,45 +353,6 @@ void evolver::printInformation()
     }
 }
 
-// int evolver::createTerm(std::string _field, pres _prefactor, const std::vector<std::string> &_product)
-// {
-//     int field_index = -1;
-//     for (int i = 0; i < fields.size(); i++)
-//     {
-//         if (fields[i]->name == _field)
-//         {
-//             field_index = i;
-//             break;
-//         }
-//     }
-//
-//     if (field_index == -1)
-//     {
-//         std::cout << "Field " << _field << " not found trying to create term" << std::endl;
-//         return 1;
-//     }
-//
-//     term *newTerm = new term(sx, sy, dx, dy);
-//     newTerm->isCUDA = with_cuda;
-//
-//     for (int i = 0; i < _product.size(); i++)
-//     {
-//         std::string fieldForProduct = _product[i];
-//         for (int j = 0; j < fields.size(); j++)
-//         {
-//             if (fieldForProduct == fields[j]->name)
-//             {
-//                 newTerm->product.push_back(fields[j]);
-//             }
-//         }
-//     }
-//
-//     newTerm->prefactors = _prefactor;
-//
-//     fields[field_index]->terms.push_back(newTerm);
-//     return 0;
-// }
-
 int evolver::createTerm(std::string _field, const std::vector<pres> &_prefactors, const std::vector<std::string> &_product)
 {
     int field_index = -1;
@@ -507,8 +403,7 @@ void evolver::copyAllDataToHost()
 {
     for (int i = 0; i < fields.size(); i++)
     {
-        cudaMemcpy(fields[i]->real_array, fields[i]->real_array_d, sx*sy*sz*sizeof(float2), cudaMemcpyDeviceToHost);
-        // cudaMemcpy(fields[i]->comp_array, fields[i]->comp_array_d, sx*sy*sizeof(float2), cudaMemcpyDeviceToHost);
+        fields[i]->copyDeviceToHost();
     }
 }
 

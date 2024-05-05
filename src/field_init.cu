@@ -43,7 +43,7 @@ void field::common_constructor()
     real_dealiased = new float2[sx*sy*sz];
     cudaMalloc(reinterpret_cast<void **>(&real_dealiased_d), sx * sy * sz * sizeof(float2));
 
-    outputToFile = true;
+    outputToFile = false;
 
     // Initialize fftw plans
     if (sz == 1)

@@ -390,3 +390,88 @@ void field::createNoise()
         fftwf_execute(noise_plan);
     }
 }
+
+void field::copyHostToDevice()
+{
+    cudaMemcpy(real_array_d, real_array, sx*sy*sz*sizeof(float2), cudaMemcpyHostToDevice);
+    cudaMemcpy(comp_array_d, comp_array, sx*sy*sz*sizeof(float2), cudaMemcpyHostToDevice);
+}
+
+void field::copyDeviceToHost()
+{
+    cudaMemcpy(real_array, real_array_d, sx*sy*sz*sizeof(float2), cudaMemcpyDeviceToHost);
+    cudaMemcpy(comp_array, comp_array_d, sx*sy*sz*sizeof(float2), cudaMemcpyDeviceToHost);
+}
+
+void field::copyRealHostToDevice()
+{
+    cudaMemcpy(real_array_d, real_array, sx*sy*sz*sizeof(float2), cudaMemcpyHostToDevice);
+}
+
+void field::copyRealDeviceToHost()
+{
+    cudaMemcpy(real_array, real_array_d, sx*sy*sz*sizeof(float2), cudaMemcpyDeviceToHost);
+}
+
+void field::writeToFile(int currentTimeStep, int dim, int writePrecision)
+{
+    if (!outputToFile)
+        return;
+
+    if (isCUDA)
+        copyRealDeviceToHost();
+
+    FILE *fp;
+    std::string fileName = "data/" + name + ".csv." + std::to_string(currentTimeStep);
+    
+    fp = fopen(fileName.c_str(), "w+");
+    if (fp == NULL)
+    {
+        std::cout << "Error creating output file at timestep" << currentTimeStep << std::endl;
+        std::exit(1);
+    }
+
+    std::string outFormat = "%i, ";
+    fprintf(fp, "x, ");
+    if (dim == 2)
+    {
+        fprintf(fp, "y, ");
+        outFormat += "%i, ";
+    }
+    if (dim == 3)
+    {
+        fprintf(fp, "y, z, ");
+        outFormat += "%i, %i, ";
+    }
+    fprintf(fp, "%s\n", name.c_str());
+    outFormat += "%." + std::to_string(writePrecision) + "f\n";
+
+    for (int k = 0; k < sz; k++)
+    {
+        for (int j = 0; j < sy; j++)
+        {
+            for (int i = 0; i < sx; i++)
+            {
+                int index = k * sx * sy + j * sx + i;
+                int bytesWritten = 0;
+                if (std::isnan(real_array[index].x))
+                {
+                    std::cout << "NaN found in field " << name << std::endl;
+                    std::exit(1);
+                }
+                if (dim == 1)
+                    bytesWritten = fprintf(fp, outFormat.c_str(), i, real_array[index].x);
+                if (dim == 2)
+                    bytesWritten = fprintf(fp, outFormat.c_str(), i, j, real_array[index].x);
+                if (dim == 3)
+                    bytesWritten = fprintf(fp, outFormat.c_str(), i, j, k, real_array[index].x);
+                if (bytesWritten < 0)
+                {
+                    std::cout << "Error writing data to output file " << fileName << std::endl;
+                    std::exit(1);
+                }
+            }
+        }
+    }
+    fclose(fp);
+}
