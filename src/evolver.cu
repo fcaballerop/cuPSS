@@ -97,6 +97,8 @@ void evolver::prepareProblem()
         //data dir already exists.
     }
     // copy host to device to account for initial conditions
+    _parser->writeParamsToFile("data/parameter_list.txt");
+
     for (int i = 0; i < fields.size(); i++)
     {
         fields[i]->copyHostToDevice();
@@ -281,7 +283,7 @@ void evolver::printInformation()
                 if (fields[i]->implicit[j].iqz != 0)
                     implicitLine += "(iqz)^(" + std::to_string(fields[i]->implicit[j].iqz) + ")";
                 if (fields[i]->implicit[j].q2n != 0)
-                    implicitLine += "(q)^(" + 2*std::to_string(fields[i]->implicit[j].q2n) + ")";
+                    implicitLine += "(q)^(" + std::to_string(2*fields[i]->implicit[j].q2n) + ")";
                 if (fields[i]->implicit[j].invq != 0)
                     implicitLine += "(1/|q|)^(" + std::to_string(fields[i]->implicit[j].invq) + ")";
             }
@@ -307,7 +309,7 @@ void evolver::printInformation()
                 if (fields[i]->terms[j]->prefactors_h[p].iqz != 0)
                     line += "(iqz)^(" + std::to_string(fields[i]->terms[j]->prefactors_h[p].iqz) + ")";
                 if (fields[i]->terms[j]->prefactors_h[p].q2n != 0)
-                    line += "(q)^(" +2* std::to_string(fields[i]->terms[j]->prefactors_h[p].q2n) + ")";
+                    line += "(q)^(" + std::to_string(2*fields[i]->terms[j]->prefactors_h[p].q2n) + ")";
                 if (fields[i]->terms[j]->prefactors_h[p].invq != 0)
                     line += "(1/|q|)^(" + std::to_string(fields[i]->terms[j]->prefactors_h[p].invq) + ")";
                 if (p != fields[i]->terms[j]->prefactors_h.size()-1)

@@ -38,6 +38,7 @@ class parser
         pres add_noise(const std::string &);
         int insert_parameter(const std::string &, float);
         int exists_parameter(const std::string &);
+        void writeParamsToFile(const std::string &);
         int verbose;
 };
 

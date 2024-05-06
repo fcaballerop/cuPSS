@@ -720,3 +720,15 @@ int parser::add_equation(const std::string &_equation)
 
     return 0;
 }
+
+void parser::writeParamsToFile(const std::string &fileName)
+{
+    std::ofstream paramStream;
+    paramStream.open(fileName);
+
+    for (auto const& x : parameters)
+    {
+        paramStream << x.first << "\t" << x.second << "\n";
+    }
+    paramStream.close();
+}
