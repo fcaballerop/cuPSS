@@ -36,6 +36,8 @@ To run the cuPSS examples, first clone the repository
 ```
 git clone https://github.com/fcaballerop/cuPSS.git
 ```
+### Compiling the library
+#### Compilation with global installation
 Then compile the library, (check dependencies above if any errors come up during compilation). A CMake file is given for convenience, so cupss can be installed system wide by running
 ```
 mkdir build
@@ -44,7 +46,9 @@ cmake ../
 cmake --build .
 sudo cmake --install .
 ```
-This will create a file `build/libcupss.a` which can the be linked to any particular solver. The last command will copy this library to `/usr/lib`, and the header files to `/usr/include`. If cmake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
+This will create a file `build/libcupss.a` which can the be linked to any particular solver. The last command will copy this library to `/usr/lib`, and the header files to `/usr/include`. 
+#### Compilation with local installation
+If cmake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
 ```
 cd src
 nvcc -c *cu -O2
@@ -52,6 +56,8 @@ ar rcs libcupss.a *o
 cd ..
 ```
 This will create a file `src/libcupss.a` which can be linked to any particular solver.
+
+### Compiling and running an example
 
 A number of example solvers can be found in the `examples` directory. They can be compiled by compiling with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
 ```
