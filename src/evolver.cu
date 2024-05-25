@@ -444,3 +444,28 @@ void evolver::initializeUniformNoise(std::string field, float value)
         }
     }
 }
+
+int evolver::getSystemSizeX()
+{
+    return sx;
+}
+int evolver::getSystemSizeY()
+{
+    return sy;
+}
+int evolver::getSystemSizeZ()
+{
+    return sz;
+}
+float evolver::getSystemPhysicalSizeX()
+{
+    return ((float)sx)*dx;
+}
+float evolver::getSystemPhysicalSizeY()
+{
+    return ((float)sy)*dy;
+}
+float evolver::getSystemPhysicalSizeZ()
+{
+    return ((float)sz)*dz;
+}

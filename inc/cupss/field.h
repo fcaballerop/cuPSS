@@ -140,6 +140,10 @@ class field
     void prepareDevice();
 
     void precalculateImplicit(float dt);
+
+    float getStepqx();
+    float getStepqy();
+    float getStepqz();
 };
 
 #endif // FIELD_H

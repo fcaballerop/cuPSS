@@ -34,6 +34,13 @@ public:
     std::map<std::string, float2 *> fieldsReal;
     std::map<std::string, float2 *> fieldsFourier;
 
+    int getSystemSizeX();
+    int getSystemSizeY();
+    int getSystemSizeZ();
+    float getSystemPhysicalSizeX();
+    float getSystemPhysicalSizeY();
+    float getSystemPhysicalSizeZ();
+
     void addField(field *);
     int createField(std::string, bool);
     // int createTerm(std::string, pres, const std::vector<std::string> &);

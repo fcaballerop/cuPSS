@@ -475,3 +475,16 @@ void field::writeToFile(int currentTimeStep, int dim, int writePrecision)
     }
     fclose(fp);
 }
+
+float field::getStepqx()
+{
+    return stepqx;
+}
+float field::getStepqy()
+{
+    return stepqy;
+}
+float field::getStepqz()
+{
+    return stepqz;
+}
