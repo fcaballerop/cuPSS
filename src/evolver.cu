@@ -7,7 +7,7 @@
 #include <ostream>
 #include <string>
 #include <cuda_runtime.h>
-#include <filesystem>
+#include <sys/stat.h>
 #include "../inc/cupss.h"
 
 void evolver::common_constructor()
@@ -51,7 +51,7 @@ void evolver::common_constructor()
 
 evolver::evolver(bool _with_cuda, int _sx, float _dx, float _dt, int _ses) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1.0f), dz(1.0f), dt(_dt), writeEveryNSteps(_ses)
 {
-    std::srand(time(NULL));
+    std::srand(time(0));
     with_cuda = _with_cuda;
     
     common_constructor();
@@ -81,20 +81,26 @@ int evolver::createFromFile(const std::string &file)
 
 void evolver::prepareProblem()
 {
-    bool created_data_dir = false;
-    bool create_dir_exception = false;
-    try 
+    struct stat info;
+    std::string pathname = "data";
+
+    if ( stat( pathname.c_str(), &info ) != 0 )
     {
-        created_data_dir = std::filesystem::create_directory("data");
+        std::cout << "data directory not found, creating it.\n";
+        int dir_err = mkdir(pathname.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if (dir_err == -1) {
+            std::cout << "Error creating data directory\n";
+            std::exit(1);
+        }
     }
-    catch(std::exception &e)
+    else if ( info.st_mode & S_IFDIR )
     {
-        create_dir_exception = true;
-        std::cout << "ERROR CREATING DATA DIRECTORY, is there a file called 'data'?" << std::endl;
+        // data directory already exists, do nothing
     }
-    if ((not created_data_dir) && (!create_dir_exception))
+    else 
     {
-        //data dir already exists.
+        std::cout << "Can't create data directory, is there a file called data?\n";
+        std::exit(1);
     }
     // copy host to device to account for initial conditions
     _parser->writeParamsToFile("data/parameter_list.txt");
@@ -425,6 +431,7 @@ void evolver::initializeUniformNoise(std::string field, float value)
         std::cout << "ERROR in initialize uniform, " << field << " not found" << std::endl;
         std::exit(1);
     }
+    srand(time(0));
     for (int k = 0; k < sz; k++)
     {
         for (int j = 0; j < sy; j++)
