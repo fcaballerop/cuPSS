@@ -1,23 +1,39 @@
+/*      CAHN-HILLIARD in 2D
+ * This solver implements the Cahn-Hilliard equation in a 2D lattice.
+ * This equation describes the evolution of a field phi through the PDE:
+ * 
+ * dt phi = \nabla^2 (a*phi + b*phi^3 -k \nabla^2 phi)
+ * 
+ * or in Fourier space:
+ *
+ * dt phi = -q^2 * (a*phi + b*phi^3 + k*q^2*phi)
+ *
+ * where the phi^3 represents now a convolution in q-space.
+ */
+
 #include <iostream>
 #include "../inc/cupss.h"
 
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define NX 256
-#define NY 256 
 
 int main(int argc, char **argv)
 {
-    evolver system(1, NX, NY, 1.0f, 1.0f, 0.1f, 100);
+    int NX = 128, NY = 128;
+    float dx = 1.0, dy = 1.0;
+    float dt = 0.1;
+    float output_every_n_steps = 1000;
+
+    evolver system(1, NX, NY, dx, dy, dt, output_every_n_steps);
 
     system.createField("phi", true);
 
-    system.addParameter("a", -1.0f);
-    system.addParameter("b", 1.0f);
-    system.addParameter("k", 4.0f);
+    system.addParameter("a", -1.0);
+    system.addParameter("b",  1.0);
+    system.addParameter("k",  4.0);
 
-    system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 ");
+    system.addEquation("dt phi + q^2*(a + k*q^2)*phi= - b*q^2*phi^3");
 
     system.initializeUniformNoise("phi", 0.01);
 
@@ -25,9 +41,8 @@ int main(int argc, char **argv)
 
     system.setOutputField("phi", true);
 
-    int steps = 100000;
-    int check = steps/100;
-    if (check < 1) check = 1;
+    int steps = 10000;
+    int check = steps/100 < 1 ? 1 : steps/100;
 
     for (int i = 0; i < steps; i++)
     {
