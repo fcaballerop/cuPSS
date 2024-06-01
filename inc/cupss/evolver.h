@@ -76,6 +76,9 @@ public:
 
     void initializeUniform(std::string, float);
     void initializeUniformNoise(std::string, float);
+    void initializeNormalNoise(std::string, float, float);
+    void initializeHalfSystem(std::string, float, float, float, int);
+    void initializeDroplet(std::string, float, float, float, float, int, int, int);
 };
 
 #endif // EVOLVER_H
