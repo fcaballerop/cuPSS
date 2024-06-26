@@ -14,9 +14,9 @@ int main(int argc, char **argv)
     float dt = 0.1f;
     int steps = 10000;
     int outputfreq = 100;
-    int gpu = 1;
+    int device_to_run_on = RUN_GPU; // RUN_CPU to run on CPU
 
-    evolver system(gpu, NX, NY, NZ, dx, dy, dz, dt, outputfreq);
+    evolver system(device_to_run_on, NX, NY, NZ, dx, dy, dz, dt, outputfreq);
 
     system.addParameter("D", 1.0f);
     
