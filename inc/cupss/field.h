@@ -17,6 +17,7 @@ class term;
 struct pres;
 
 class evolver;
+class BoundaryConditions;
 
 class field
 {

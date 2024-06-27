@@ -4,10 +4,9 @@
 #include <string>
 #include <functional>
 #include <memory>
-typedef enum BoundaryDirection {xminus,xplus,yminus,yplus,zminus,zplus};
-typedef enum BoundaryType {Dirichlet,VonNeumann};
+typedef enum {xminus,xplus,yminus,yplus,zminus,zplus} BoundaryDirection;
+typedef enum {Dirichlet,VonNeumann} BoundaryType;
 
-class evolver;
 class BoundaryConditions {
 // this class knows if its in the x,y or z direction
 // this class has a function f(x,y,z) or f(x,y) that returns a value
@@ -25,11 +24,11 @@ private:
     bool _with_cuda;
     std::function<float(float,float,float)> _value_fn;
     float _value;
-    float std::unique_ptr<float[]> _values;
+    float* _values;
     float *d_values = nullptr; // for use when we have a BC that varies over space
     std::array<int,3> _boundarySize;
     std::array<int,3> _fieldSize;
-    std::array<float,3> _fieldSpacing
+    std::array<float,3> _fieldSpacing;
 
     dim3 _blockDim;
     dim3 _threadDim;
@@ -41,7 +40,7 @@ public:
     BoundaryConditions(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value); // 3d constructor
     BoundaryConditions(BoundaryType type, BoundaryDirection dimension, float value);
     void initalize(field*);
-    void operator(float2*); // applies the boundary condition
-    void applyDirichelt(float2*);
-    void applyVonNuemann(float2*);
+    void operator()(float2*); // applies the boundary condition
+    void applyDirichlet(float2*);
+    void applyVonNeumann(float2*);
 };

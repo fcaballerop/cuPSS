@@ -16,6 +16,8 @@ add_library(cupss STATIC
     src/term.cu
     src/term_init.cu
     src/term_kernels.cu
+    src/boundary.cu
+    src/boundary_kernels.cu
     )
 set_property(TARGET cupss PROPERTY CUDA_ARCHITECTURES OFF)
 
