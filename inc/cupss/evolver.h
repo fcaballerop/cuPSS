@@ -3,12 +3,11 @@
 
 #include <vector>
 #include <string>
-
+#include <array>
 #include "defines.h"
-
+#include "boundary.h"
 class field;
 class parser;
-
 struct pres;
 
 class evolver
@@ -29,7 +28,6 @@ public:
     evolver(bool, int, int, float, float, float, int);
     evolver(bool, int, int, int, float, float, float, float, int);
     void common_constructor();
-
     std::map<std::string, field *> fieldsMap;
     std::map<std::string, float2 *> fieldsReal;
     std::map<std::string, float2 *> fieldsFourier;
@@ -48,8 +46,10 @@ public:
 
     int addParameter(std::string, float);
     int addEquation(std::string);
+    int addBoundaryCondition(std::string,BoundaryConditions);
     int addNoise(std::string, std::string);
     int createFromFile(const std::string &);
+    
 
     int existsField(std::string);
 
@@ -79,6 +79,7 @@ public:
     void initializeNormalNoise(std::string, float, float);
     void initializeHalfSystem(std::string, float, float, float, int);
     void initializeDroplet(std::string, float, float, float, float, int, int, int);
+
 };
 
 #endif // EVOLVER_H

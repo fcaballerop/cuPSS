@@ -11,6 +11,7 @@
 #include <ostream>
 #include "../inc/cupss.h"
 #include "../inc/cupss/field_kernels.cuh"
+#include "field.h"
 
 int field::updateTerms()
 {
@@ -78,6 +79,31 @@ int field::setRHS(float dt)
 
     // If there are callback functions defined for the field, they should be executed
     // here, maybe take a pointer to a function to be called back here
+    // do BC here
+    // format theBCcall like this so that we can just register it as a callback
+    // apply to both de and regular
+
+    // apply boundary conditions
+    for (int i = 0; i<boundary_conditions.size(); i++)
+    {
+        if (isCUDA)
+        {
+            boundary_conditions[i](real_array_d);
+            if (needsaliasing)
+            {
+                boundary_conditions[i](real_dealiased_d);
+            }
+        }
+        else {
+            boundary_conditions[i](real_array);
+            if (needsaliasing)
+            {
+                boundary_conditions[i](real_dealiased);
+            }
+        }
+    }
+
+
     if (hasCB)
     {
         if (callback == NULL)
@@ -487,4 +513,11 @@ float field::getStepqy()
 float field::getStepqz()
 {
     return stepqz;
+}
+
+void field::addBoundaryCondition(BoundaryConditions)
+{
+    boundary_conditions.push_back(BC);
+    boundary_conditions[boundary_conditions.size()].initalize(this);
+
 }

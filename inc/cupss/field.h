@@ -38,6 +38,7 @@ class field
     cudaStream_t stream_d;
     curandRngType_t rng_d;
     curandOrdering_t order_d;
+    std::vector<BoundaryConditions> boundary_conditions;
 
 
     public:
@@ -144,6 +145,11 @@ class field
     float getStepqx();
     float getStepqy();
     float getStepqz();
+
+    void addBoundaryCondition(BoundaryConditions);
+    std::array<int,3> get_size(){return {sx,sy,sz};}
+    std::array<float,3> get_spacing(){return {dx,dy,dz};}
+
 };
 
 #endif // FIELD_H
