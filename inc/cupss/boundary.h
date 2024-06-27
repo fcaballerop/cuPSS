@@ -4,7 +4,9 @@
 #include <string>
 #include <functional>
 #include <memory>
-typedef enum boundaryDirection {xminus,xplus,yminus,yplus,zminus,zplus};
+typedef enum BoundaryDirection {xminus,xplus,yminus,yplus,zminus,zplus};
+typedef enum BoundaryType {Dirichlet,VonNeumann};
+
 class evolver;
 class BoundaryConditions {
 // this class knows if its in the x,y or z direction
@@ -17,31 +19,29 @@ class BoundaryConditions {
 private:
     std::string _fieldName;
     field* _field=nullptr;
-    boundaryDirection _dimension;
+    BoundaryDirection _dimension;
+    BoundaryType _type;
     bool _single_value;
     bool _with_cuda;
     std::function<float(float,float,float)> _value_fn;
     float _value;
     float std::unique_ptr<float[]> _values;
     float *d_values = nullptr; // for use when we have a BC that varies over space
-    std::array<int,3> _iterateSize;
+    std::array<int,3> _boundarySize;
     std::array<int,3> _fieldSize;
     std::array<float,3> _fieldSpacing
+
+    dim3 _blockDim;
+    dim3 _threadDim;
 
     int _depth = 10; // the depth of the boundary layer
     long flatten_index(std::array<int,3>);
 
 public:
-    BoundaryConditions(boundaryDirection dimension, std::function<float(float,float,float)> value); // 3d constructor
-    BoundaryConditions(boundaryDirection dimension, float value);
+    BoundaryConditions(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value); // 3d constructor
+    BoundaryConditions(BoundaryType type, BoundaryDirection dimension, float value);
     void initalize(field*);
-    virtual void operator() = 0; // applies the boundary condition
+    void operator(float2*); // applies the boundary condition
+    void applyDirichelt(float2*);
+    void applyVonNuemann(float2*);
 };
-class Dirichlet : public BoundaryConditions
-{
-    void operator(float2*)
-}
-class VonNeumann: public BoundaryConditions
-{
-    void operator(float2*)
-}
