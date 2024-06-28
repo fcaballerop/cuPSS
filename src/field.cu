@@ -518,6 +518,6 @@ float field::getStepqz()
 void field::addBoundaryCondition(BoundaryConditions BC)
 {
     boundary_conditions.push_back(BC);
-    boundary_conditions[boundary_conditions.size()].initalize(this);
+    boundary_conditions[boundary_conditions.size()-1].initalize(this);
 
 }

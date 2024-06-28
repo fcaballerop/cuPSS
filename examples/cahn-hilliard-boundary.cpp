@@ -28,13 +28,17 @@ int main(int argc, char **argv)
     evolver system(1, NX, NY, dx, dy, dt, output_every_n_steps);
 
     system.createField("phi", true);
-    std::function<double(double,double,double)> boundary_Value_x =[](double x, double y, double z){return y/128;};
+    std::function<float(float,float,float)> boundary_Value_x = [](float x, float y, float z){return y/127;};
 
-    std::function<double(double,double,double)> boundary_Value_y =[](double x, double y, double z){return x/128;};
-    system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::Dirichlet,BoundaryDirection::xminus,0));
+    // std::function<float(float,float,float)> boundary_Value_y = [](float x, float y, float z){return x/128;};
+    std::cout<<"boundary_Value_x of (0,0,0) is "<<boundary_Value_x(0,0,0)<<std::endl;
+    system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::Dirichlet,BoundaryDirection::xminus,boundary_Value_x));
+    // system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::Dirichlet,BoundaryDirection::xplus,1.0f));
+
     system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::Dirichlet,BoundaryDirection::xplus,boundary_Value_x));
-    system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::VonNeumann,BoundaryDirection::yminus,0));
-    system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::VonNeumann,BoundaryDirection::yplus,boundary_Value_y));
+    system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::Dirichlet,BoundaryDirection::yminus,-1.0/127));
+    system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::Dirichlet,BoundaryDirection::yplus,1.0/127));
+    // system.addBoundaryCondition("phi",BoundaryConditions(BoundaryType::VonNeumann,BoundaryDirection::yplus,boundary_Value_y));
     
 
     system.addParameter("a", -1.0);
@@ -49,7 +53,7 @@ int main(int argc, char **argv)
 
     system.setOutputField("phi", true);
 
-    int steps = 10000;
+    int steps = 100000;
     int check = steps/100 < 1 ? 1 : steps/100;
 
     for (int i = 0; i < steps; i++)

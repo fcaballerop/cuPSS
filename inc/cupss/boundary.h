@@ -20,11 +20,11 @@ private:
     field* _field=nullptr;
     BoundaryDirection _dimension;
     BoundaryType _type;
-    bool _single_value;
+    bool _single_value = 1;
     bool _with_cuda;
-    std::function<float(float,float,float)> _value_fn;
+    std::function<float(float,float,float)> _value_fn = [](float x, float y, float z){return 0;};
     float _value;
-    float* _values;
+    float* _values =nullptr;
     float *d_values = nullptr; // for use when we have a BC that varies over space
     std::array<int,3> _boundarySize;
     std::array<int,3> _fieldSize;
@@ -39,6 +39,7 @@ private:
 public:
     BoundaryConditions(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value); // 3d constructor
     BoundaryConditions(BoundaryType type, BoundaryDirection dimension, float value);
+    BoundaryConditions();
     void initalize(field*);
     void operator()(float2*); // applies the boundary condition
     void applyDirichlet(float2*);

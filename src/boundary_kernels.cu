@@ -86,8 +86,8 @@ __global__ void applyVonNuemannSingleValue(float2 * field_values,float value,int
                 dim_i[dimension] = ib;
                 dim_i_one_in[dimension] = ib+1;
             } else {
-                dim_i[dimension] = size[dimension] - 1 - ib;
-                dim_i_one_in[dimension] = size[dimension] - 1 - ib -1;
+                dim_i[dimension] = size[dimension] - 1 - ib; //5 -1 - 1 = 3
+                dim_i_one_in[dimension] = size[dimension] - 1 - (ib +1); // 5 -1 -1 -1 = 2
 
             }
             fieldIndex = dim_i[0] + dim_i[1] * field_size.x + dim_i[2] * field_size.x * field_size.y;

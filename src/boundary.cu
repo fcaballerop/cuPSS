@@ -1,12 +1,16 @@
 #include "boundary.h"
 #include "boundary_kernels.cuh"
 
-BoundaryConditions::BoundaryConditions(BoundaryType type, BoundaryDirection _dimension, std::function<float(float,float,float)> value)
-    :_type(type),_dimension(_dimension),_value_fn(value),_single_value(false){}
+BoundaryConditions::BoundaryConditions(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value)
+    :_type(type),_dimension(dimension){
+        _single_value=0;
+        _value_fn=value;
+}
      // 3d constructor
-BoundaryConditions::BoundaryConditions(BoundaryType type, BoundaryDirection _dimension, float value)
-    :_type(type),_dimension(_dimension),_value(value),_single_value(true){} //2d constructor
-
+BoundaryConditions::BoundaryConditions(BoundaryType type, BoundaryDirection dimension, float value)
+    :_type(type),_dimension(dimension),_value(value){
+        _single_value=1;
+    } //2d constructor
 void BoundaryConditions::initalize(field * myField){
     // ok first thing we need to do is grab the pointer to the field
     // _field = myEvolver->fieldsMap[_fieldName]; // TO DO Name validation
@@ -15,7 +19,6 @@ void BoundaryConditions::initalize(field * myField){
     _with_cuda = myField->isCUDA;
     _boundarySize = _fieldSize;
     _boundarySize[_dimension/2] = 1; // we don't need to iterate over the demension we're setting the boundary on
-
 
     // now that we have that we have dimensional information, we need to check to see if we need to calculate values for the boundary (if its not a single value)
     if (!_single_value) {
@@ -26,8 +29,7 @@ void BoundaryConditions::initalize(field * myField){
         for (long i = 0; i<3; i++){
            boundarySize*=_boundarySize[i];
         }
-        _values = new float[_fieldSize[boundarySize]];
-        
+        _values = new float[boundarySize];
         long index = 0;
         std::array<float,3> position;
         for (int iz = 0; iz<_boundarySize[2]; iz++){
@@ -44,28 +46,30 @@ void BoundaryConditions::initalize(field * myField){
                 }
             }
         }
-        
         if (_with_cuda){
-            _threadDim=dim3(32,32,32);
-            switch (_dimension/2){
-                case 0:
-                    _threadDim.x = 1;
-                    break;
-                case 1:
-                    _threadDim.y = 1;
-                    break;
-                case 2:
-                    _threadDim.z = 1;
-                    break;
-            }
-            int bx = (_boundarySize[0]+_threadDim.x-1)/_threadDim.x;
-            int by = (_boundarySize[1]+_threadDim.y-1)/_threadDim.y;
-            int bz = (_boundarySize[2]+_threadDim.z-1)/_threadDim.z;
-            _blockDim = dim3(bx,by,bz);
-
             cudaMalloc(reinterpret_cast<void **>(&d_values), boundarySize * sizeof(float));
             cudaMemcpy(d_values, _values, boundarySize * sizeof(float), cudaMemcpyHostToDevice);
         }
+    }
+    
+    if (_with_cuda){
+        _threadDim=dim3(32,32,32);
+        switch (_dimension/2){
+            case 0:
+                _threadDim.x = 1;
+                break;
+            case 1:
+                _threadDim.y = 1;
+                break;
+            case 2:
+                _threadDim.z = 1;
+                break;
+        }
+        // for 128x128 in, boundary in the x dim we have
+        int bx = (_boundarySize[0]+_threadDim.x-1)/_threadDim.x; // 1+1-1/1 = 1
+        int by = (_boundarySize[1]+_threadDim.y-1)/_threadDim.y; // (128 + 32 -1)/32 =  
+        int bz = (_boundarySize[2]+_threadDim.z-1)/_threadDim.z;
+        _blockDim = dim3(bx,by,bz);
     }
 }
 long BoundaryConditions::flatten_index(std::array<int,3> dimension_index)
@@ -117,7 +121,7 @@ void BoundaryConditions::applyDirichlet(float2* fieldValues)
                             // left wall
                             dimension_index[_dimension/2]=ib;
                         }
-                        if (_dimension%1 == 1){
+                        if (_dimension%2 == 1){
                             // right wall
                             dimension_index[_dimension/2]=_fieldSize[_dimension/2]-ib-1;
                         }
@@ -170,7 +174,7 @@ void BoundaryConditions::applyVonNeumann(float2* fieldValues){
                             dimension_index_one_in[_dimension/2]=(_depth-ib);
 
                         }
-                        if (_dimension%1 == 1){
+                        if (_dimension%2 == 1){
                             // right wall
                             dimension_index[_dimension/2]=_fieldSize[_dimension/2]-1-(ib-_depth-1);
                             dimension_index_one_in[_dimension/2]=_fieldSize[_dimension/2]-1-(ib-_depth);
