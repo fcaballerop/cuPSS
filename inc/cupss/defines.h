@@ -52,6 +52,8 @@ struct full_term
 // Global definitions
 #define PI 3.1415926535f
 
+enum DeviceToRunOn {RUN_CPU, RUN_GPU};
+
 enum integrators { EULER, RK2, RK4 };
 
 enum NoiseType {GaussianWhite};

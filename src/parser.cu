@@ -238,6 +238,11 @@ int parser::is_q2n_factor(const std::string &factor)
     if (factor[0] == 'q' && factor[1] == '^')
     {
         std::string number_str = factor.substr(2);
+        if (!is_number(number_str))
+        {
+            std::cout << "ERROR in parser: " << number_str << " power of q not a number, missing *?" << std::endl;
+            std::exit(1);
+        }
         return atoi(number_str.c_str());
     }
 
@@ -256,6 +261,11 @@ int parser::is_iq_factor(const std::string &factor, const std::string &iq)
     else if (factor.substr(0,3) == iq)
     {
         std::string number_str = factor.substr(4);
+        if (!is_number(number_str))
+        {
+            std::cout << "ERROR in parser: " << number_str << " power of " << iq << " not a number, missing *?" << std::endl;
+            std::exit(1);
+        }
         return atoi(number_str.c_str());
     }
     return 0;

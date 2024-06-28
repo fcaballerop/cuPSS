@@ -20,7 +20,7 @@
 
 int main(int argc, char **argv)
 {
-    evolver system(1, NX, NY, 1.0f, 1.0f, 0.1f, 100);
+    evolver system(RUN_GPU, NX, NY, 1.0f, 1.0f, 0.1f, 100);
 
     system.createField("phi", true);        // 0
     system.createField("lphi", false);

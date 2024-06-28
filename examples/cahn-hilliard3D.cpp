@@ -4,13 +4,13 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define NX 128
-#define NY 128 
-#define NZ 128
+#define NX 256
+#define NY 256 
+#define NZ 256
 
 int main(int argc, char **argv)
 {
-    evolver system(1, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.01f, 100);
+    evolver system(RUN_GPU, NX, NY, NZ, 1.0f, 1.0f, 1.0f, 0.01f, 100);
 
     system.createField("phi", true);
 
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     system.addEquation("dt phi + ( a *q^2 + k*q^4)*phi= - b* q^2* phi^3 ");
 
-    system.initializeUniformNoise("phi", 0.01)
+    system.initializeUniformNoise("phi", 0.01);
 
     system.prepareProblem();
 

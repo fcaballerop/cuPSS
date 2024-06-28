@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     float dt = 0.1;
     float output_every_n_steps = 1000;
 
-    evolver system(1, NX, NY, dx, dy, dt, output_every_n_steps);
+    evolver system(RUN_GPU, NX, NY, dx, dy, dt, output_every_n_steps);
 
     system.createField("phi", true);
 
