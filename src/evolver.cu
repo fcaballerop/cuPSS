@@ -585,3 +585,8 @@ float evolver::getSystemPhysicalSizeZ()
 {
     return ((float)sz)*dz;
 }
+
+float evolver::getParameter(const std::string &name)
+{
+    return _parser->getParameter(name);
+}

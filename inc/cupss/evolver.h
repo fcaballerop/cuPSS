@@ -51,6 +51,8 @@ public:
     int addNoise(std::string, std::string);
     int createFromFile(const std::string &);
 
+    float getParameter(const std::string &);
+
     int existsField(std::string);
 
     // Global variables

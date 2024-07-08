@@ -742,3 +742,13 @@ void parser::writeParamsToFile(const std::string &fileName)
     }
     paramStream.close();
 }
+
+float parser::getParameter(const std::string &name)
+{
+    if (!exists_parameter(name))
+    {
+        std::cout << "ERROR: getParameter " << name << " not found" << std::endl;
+        std::exit(1);
+    }
+    return parameters[name];
+}

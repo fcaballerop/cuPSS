@@ -39,6 +39,7 @@ class parser
         int insert_parameter(const std::string &, float);
         int exists_parameter(const std::string &);
         void writeParamsToFile(const std::string &);
+        float getParameter(const std::string &);
         int verbose;
 };
 
