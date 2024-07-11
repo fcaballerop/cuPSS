@@ -9,6 +9,7 @@ project(cuPSS LANGUAGES CXX CUDA)
 
 add_library(cupss STATIC
     src/evolver.cu
+    src/initializers.cu
     src/field.cu
     src/field_init.cu
     src/field_kernels.cu
