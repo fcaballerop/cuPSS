@@ -177,7 +177,6 @@ float parser::is_numerical_factor(const std::string &factor)
     else
         _factor = factor;
 
-
     if (exists_parameter(_factor))
     {
         if (divides)
@@ -475,7 +474,7 @@ int parser::split_terms(std::string input, std::vector<std::string> &terms)
     }
     // std::cout << "splitted " << input.substr(current) << std::endl;
     terms.push_back(input.substr(current));
-    return 0;   
+    return 0;
 }
 
 // will expand one set of parenthesis once
@@ -563,6 +562,15 @@ pres parser::get_prefactor(std::string _term)
         term = term.substr(1);
     }
 
+    for (int i = 0; i < term.size(); i++)
+    {
+        if (term[i] == '/')
+        {
+            term.insert(i, "*1");
+            i+=2;
+        }
+    }
+
     std::vector<std::string> factors;
     get_factors(term, factors);
 
@@ -584,8 +592,10 @@ pres parser::get_prefactor(std::string _term)
     return prefactor;
 }
 
-int parser::get_field_vector(std::string term, std::vector<std::string> &fields)
+int parser::get_field_vector(std::string _term, std::vector<std::string> &fields)
 {
+    std::string term = _term;
+
     if (term[0] == '+')
     {
         term = term.substr(1);
@@ -593,6 +603,14 @@ int parser::get_field_vector(std::string term, std::vector<std::string> &fields)
     if (term[0] == '-')
     {
         term = term.substr(1);
+    }
+    for (int i = 0; i < term.size(); i++)
+    {
+        if (term[i] == '/')
+        {
+            term.insert(i, "*1");
+            i+=2;
+        }
     }
     std::vector<std::string> factors;
     get_factors(term, factors);
@@ -615,9 +633,9 @@ int parser::add_equation(const std::string &_equation)
 {
     std::string equation = _equation;
     remove_spaces(equation);
-    
+
     std::cout << "Processing\n" << equation << "\n";
-    
+
     int dynamic = 0;
     std::string field_name;
     std::string lhs, rhs;
@@ -682,7 +700,7 @@ int parser::add_equation(const std::string &_equation)
         implicits.push_back(this_prefactor);
     }
 
-    // process rhs 
+    // process rhs
     for (int i = 0; i < rhs_terms.size(); i++)
     {
         std::vector<std::string> fields;
