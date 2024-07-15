@@ -81,6 +81,7 @@ public:
     void initializeNormalNoise(std::string, float, float);
     void initializeHalfSystem(std::string, float, float, float, int);
     void initializeDroplet(std::string, float, float, float, float, int, int, int);
+    void addDroplet(std::string, float, float, float, int, int, int);
 };
 
 #endif // EVOLVER_H

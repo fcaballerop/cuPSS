@@ -174,3 +174,40 @@ void evolver::initializeDroplet(std::string field, float val1, float val2, float
         }
     }
 }
+
+void evolver::addDroplet(std::string field, float val, float radius, float xi, int p_x, int p_y, int p_z)
+{
+    bool found = false;
+    for (int i = 0; i < fields.size(); i++)
+        if (field == fields[i]->name)
+            found = true;
+    if (!found)
+    {
+        std::cout << "ERROR in initialize droplet, " << field << " not found" << std::endl;
+        std::exit(1);
+    }
+    if (xi <= 0.0 || radius <= 0.0)
+    {
+        std::cout << "ERROR in initialize, droplet radius and interface width cannot be 0 or negative" << std::endl;
+        std::exit(1);
+    }
+    int x_ = p_x % sx;
+    int y_ = p_y % sy;
+    int z_ = p_z % sz;
+    srand(time(0));
+    for (int k = 0; k < sz; k++)
+    {
+        for (int j = 0; j < sy; j++)
+        {
+            for (int i = 0; i < sx; i++)
+            {
+                int index = k * sx * sy + j * sx + i;
+                float x_d = i - x_;
+                float y_d = j - y_;
+                float z_d = k - z_;
+                float r_c = std::sqrt(x_d*x_d + y_d*y_d + z_d*z_d);
+                fieldsMap[field]->real_array[index].x += val*0.5*(1.0 + std::tanh((radius - r_c)/(std::sqrt(2)*xi)));
+            }
+        }
+    }
+}
