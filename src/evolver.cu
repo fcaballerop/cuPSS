@@ -96,6 +96,7 @@ void evolver::prepareProblem()
     else if ( info.st_mode & S_IFDIR )
     {
         // data directory already exists, do nothing
+        std::cout << "data directory already found, might rewrite output data.\n";
     }
     else 
     {
@@ -105,12 +106,15 @@ void evolver::prepareProblem()
     // copy host to device to account for initial conditions
     _parser->writeParamsToFile("data/parameter_list.txt");
 
+    std::cout << "Preparing problem." << std::endl;
+    std::cout << "Copying initial states to device if necessary." << std::endl;
     for (int i = 0; i < fields.size(); i++)
     {
         fields[i]->copyHostToDevice();
         fields[i]->toComp();
     }
     // for each field prepare device and precalculate implicits
+    std::cout << "Preparing device and precalculating implicit matrices." << std::endl;
     for (int i = 0; i < fields.size(); i++)
     {
         fields[i]->prepareDevice();
@@ -424,4 +428,14 @@ float evolver::getSystemPhysicalSizeZ()
 float evolver::getParameter(const std::string &name)
 {
     return _parser->getParameter(name);
+}
+
+void check_error(cudaError_t err)
+{
+    if (err != cudaSuccess)
+    {
+        std::cerr << "CUDA Runtime Error" << std::endl;
+        std::cerr << cudaGetErrorString(err) << std::endl;
+        std::exit(1);
+    }
 }

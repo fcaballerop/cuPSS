@@ -12,8 +12,8 @@ void term::common_constructor()
 {
     term_real = new float2[sx*sy*sz];
     term_comp = new float2[sx*sy*sz];
-    cudaMalloc(reinterpret_cast<void **>(&term_real_d), sx * sy * sz * sizeof(float2));
-    cudaMalloc(reinterpret_cast<void **>(&term_comp_d), sx * sy * sz * sizeof(float2));
+    check_error(cudaMalloc(reinterpret_cast<void **>(&term_real_d), sx * sy * sz * sizeof(float2)));
+    check_error(cudaMalloc(reinterpret_cast<void **>(&term_comp_d), sx * sy * sz * sizeof(float2)));
     isCUDA = true;
     
 
@@ -71,7 +71,7 @@ void term::common_constructor()
     cudaMemcpy(term_comp_d, term_comp, sx * sy * sz * sizeof(float2), cudaMemcpyHostToDevice);
 
     precomp_prefactor_h = new float[sx * sy * sz];
-    cudaMalloc(reinterpret_cast<void **>(&precomp_prefactor_d), sx * sy * sz * sizeof(float));
+    check_error(cudaMalloc(reinterpret_cast<void **>(&precomp_prefactor_d), sx * sy * sz * sizeof(float)));
 }
 
 term::term(int _sx, float _dx) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1.0f), dz(1.0f), stepqx(2.0f*PI/(_dx * (float)_sx)), stepqy(2.0f*PI/(1.0f * (float)1)), stepqz(2.0f*PI/(1.0f * (float)1))
@@ -92,11 +92,11 @@ term::term(int _sx, int _sy, int _sz, float _dx, float _dy, float _dz) : sx(_sx)
 
 int term::prepareDevice()
 {
-    cudaMalloc(reinterpret_cast<void **>(&prefactors_d), prefactors_h.size() * sizeof(pres));
+    check_error(cudaMalloc(reinterpret_cast<void **>(&prefactors_d), prefactors_h.size() * sizeof(pres)));
     cudaMemcpy(prefactors_d, &prefactors_h[0], prefactors_h.size() * sizeof(pres), cudaMemcpyHostToDevice);
 
     product_h = new float2*[product.size()];
-    cudaMalloc(reinterpret_cast<void **>(&product_d), product.size() * sizeof(float2*));
+    check_error(cudaMalloc(reinterpret_cast<void **>(&product_d), product.size() * sizeof(float2*)));
     for (int i = 0; i < product.size(); i++)
     {
         if (product.size() == 1)
