@@ -28,17 +28,26 @@ Detailed information about how to code a solver using this library can be found 
  * CUDA toolkit (11+)
  * cuFFT
  * cuRAND
- * FFTW3
+ * FFTW3 (with single point precision)
 
 ## Quickstart
 
-To run the cuPSS examples, first clone the repository
+### Installing dependencies
+
+Install the <a href="https://developer.nvidia.com/cuda-toolkit">CUDA toolkit</a>. 
+
+Install <a href="https://www.fftw.org/">fftw3</a> with single point precision. Follow their <a href="https://www.fftw.org/fftw3_doc/Installation-on-Unix.html">installation instructions</a> adding `--enable-float` to the `./configure` command.
+
+### Compiling the library
+
+To download cuPSS and test the examples, first clone the repository
 ```
 git clone https://github.com/fcaballerop/cuPSS.git
+cd cuPSS/
 ```
-### Compiling the library
-#### Compilation with global installation
-Then compile the library, (check dependencies above if any errors come up during compilation). A CMake file is given for convenience, so cupss can be installed system wide by running
+
+#### Option 1: Compilation with global installation
+A CMake file is given for convenience, so cupss can be installed system wide by running (check dependencies above if any errors come up during compilation, specially fftw3 with single point precision).
 ```
 mkdir build
 cd build
@@ -47,7 +56,7 @@ cmake --build .
 sudo cmake --install .
 ```
 This will create a file `build/libcupss.a` which can the be linked to any particular solver. The last command will copy this library to `/usr/lib`, and the header files to `/usr/include`. 
-#### Compilation with local installation
+#### Option 2: Compilation with local installation
 If cmake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
 ```
 cd src
@@ -55,19 +64,19 @@ nvcc -c *cu -O2
 ar rcs libcupss.a *o
 cd ..
 ```
-This will create a file `src/libcupss.a` which can be linked to any particular solver.
+This will create a file `src/libcupss.a` which can be linked to any particular solver. The header files are in `inc`.
 
 ### Compiling and running an example
 
-A number of example solvers can be found in the `examples` directory. They can be compiled by compiling with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/modelb.cpp`, can be compiled by
+A number of example solvers can be found in the `examples` directory. They can be compiled with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/cahn-hilliars.cpp`, can be compiled by
 ```
 nvcc examples/cahn-hilliard.cpp --lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
 ```
-If cupss was not installed globally, the location of `libcupss.a` must be specified:
+If cupss was not installed globally, the location of `libcupss.a` must be specified with the linker flag `-L`:
 ```
 nvcc examples/cahn-hilliard.cpp -Lsrc/ -lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
 ```
-The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located. It will be in `src/` if the library has been compiled with the lines above. The solver can be run by
+The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located. It will be in `src/` if the library has been compiled with the lines above. The solver can be run with
 ```
 ./cahn-hilliard
 ```
