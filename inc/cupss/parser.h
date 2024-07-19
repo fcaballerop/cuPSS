@@ -28,8 +28,8 @@ class parser
         int expand_once(std::string input, std::vector<std::string> &terms);
         int expand_all(std::vector<std::string> &terms);
         int get_fields(std::string term, std::vector<std::string> &fields);
-        int get_field_vector(std::string, std::vector<std::string> &fields);
-        pres get_prefactor(std::string);
+        int get_field_vector(const std::string &, std::vector<std::string> &fields);
+        pres get_prefactor(const std::string &);
 
     public:
         int createFromFile(const std::string &);

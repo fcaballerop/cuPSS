@@ -128,7 +128,7 @@ void evolver::prepareProblem()
     }
 }
 
-void evolver::setOutputField(std::string _name, int _output)
+void evolver::setOutputField(const std::string &_name, int _output)
 {
     for (int i = 0; i < fields.size(); i++)
     {
@@ -144,19 +144,19 @@ void evolver::setOutputField(std::string _name, int _output)
     std::cout << "setOutputField EROR: " << _name << " not found." << std::endl;
 }
 
-int evolver::addParameter(std::string _name, float value)
+int evolver::addParameter(const std::string &_name, float value)
 {
     _parser->insert_parameter(_name, value);
     return 0;
 }
 
-int evolver::addEquation(std::string equation)
+int evolver::addEquation(const std::string &equation)
 {
     _parser->add_equation(equation);
     return 0;
 }
 
-int evolver::existsField(std::string _name)
+int evolver::existsField(const std::string &_name)
 {
     int foundIndex = -1;
     for (int i = 0; i < fields.size(); i++)
@@ -170,7 +170,7 @@ int evolver::existsField(std::string _name)
     return foundIndex;
 }
 
-int evolver::addNoise(std::string _name, std::string equation)
+int evolver::addNoise(const std::string &_name, const std::string &equation)
 {
     if (existsField(_name) == -1)
     {
@@ -351,7 +351,7 @@ void evolver::printInformation()
     }
 }
 
-int evolver::createTerm(std::string _field, const std::vector<pres> &_prefactors, const std::vector<std::string> &_product)
+int evolver::createTerm(const std::string &_field, const std::vector<pres> &_prefactors, const std::vector<std::string> &_product)
 {
     int field_index = -1;
 

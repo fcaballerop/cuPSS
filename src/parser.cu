@@ -20,16 +20,16 @@ int parser::createFromFile(const std::string &_file_name)
     {
         std::cout << line << std::endl;
         std::istringstream iss(line);
-        if (line == "" || line.substr(0,0) == "#")
+        if (line == "" || line.substr(0,1) == "#")
             continue;
         if (read_type == -1)
         {
             // must read a type
             if (line.substr(0,6) == "Fields" || line.substr(0,6) == "fields")
                 read_type = 0;
-            else if (line.substr(0,6) == "Parameters" || line.substr(0,6) == "parameters")
+            else if (line.substr(0,10) == "Parameters" || line.substr(0,10) == "parameters")
                 read_type = 1;
-            else if (line.substr(0,6) == "Equations" || line.substr(0,6) == "Equations")
+            else if (line.substr(0,9) == "Equations" || line.substr(0,9) == "equations")
                 read_type = 2;
             else
             {
@@ -120,7 +120,7 @@ int parser::exists_parameter(const std::string &p_name)
         {
             return 1;
         }
-        it++;
+        ++it;
     }
 
     return 0;
@@ -548,7 +548,7 @@ int parser::expand_all(std::vector<std::string> &terms)
     return 0;
 }
 
-pres parser::get_prefactor(std::string _term)
+pres parser::get_prefactor(const std::string &_term)
 {
     std::string term = _term;
     pres prefactor = {1.0f, 0, 0, 0, 0, 0};
@@ -592,7 +592,7 @@ pres parser::get_prefactor(std::string _term)
     return prefactor;
 }
 
-int parser::get_field_vector(std::string _term, std::vector<std::string> &fields)
+int parser::get_field_vector(const std::string &_term, std::vector<std::string> &fields)
 {
     std::string term = _term;
 

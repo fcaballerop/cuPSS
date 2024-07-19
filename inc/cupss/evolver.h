@@ -44,16 +44,16 @@ public:
     void addField(field *);
     int createField(std::string, bool);
     // int createTerm(std::string, pres, const std::vector<std::string> &);
-    int createTerm(std::string, const std::vector<pres> &, const std::vector<std::string> &);
+    int createTerm(const std::string &, const std::vector<pres> &, const std::vector<std::string> &);
 
-    int addParameter(std::string, float);
-    int addEquation(std::string);
-    int addNoise(std::string, std::string);
+    int addParameter(const std::string &, float);
+    int addEquation(const std::string &);
+    int addNoise(const std::string &, const std::string &);
     int createFromFile(const std::string &);
 
     float getParameter(const std::string &);
 
-    int existsField(std::string);
+    int existsField(const std::string &);
 
     // Global variables
     bool with_cuda;
@@ -74,7 +74,7 @@ public:
 
     void prepareProblem();
 
-    void setOutputField(std::string, int);
+    void setOutputField(const std::string &, int);
 
     void initializeUniform(std::string, float);
     void initializeUniformNoise(std::string, float);
