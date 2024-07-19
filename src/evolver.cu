@@ -47,6 +47,11 @@ void evolver::common_constructor()
 
     writePrecision = 6;
     _parser = new parser(this);
+
+    if (with_cuda)
+    {
+        check_device();
+    }
 }
 
 evolver::evolver(bool _with_cuda, int _sx, float _dx, float _dt, int _ses) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1.0f), dz(1.0f), dt(_dt), writeEveryNSteps(_ses)
@@ -430,12 +435,3 @@ float evolver::getParameter(const std::string &name)
     return _parser->getParameter(name);
 }
 
-void check_error(cudaError_t err)
-{
-    if (err != cudaSuccess)
-    {
-        std::cerr << "CUDA Runtime Error" << std::endl;
-        std::cerr << cudaGetErrorString(err) << std::endl;
-        std::exit(1);
-    }
-}

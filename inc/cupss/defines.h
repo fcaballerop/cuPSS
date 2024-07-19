@@ -49,7 +49,6 @@ struct full_term
 #ifndef DEFS_H
 #define DEFS_H
 
-void check_error(cudaError_t err);
 
 // Global definitions
 #define PI 3.1415926535f
