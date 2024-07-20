@@ -35,7 +35,7 @@ void check_device()
     }
 
     std::cout << "CUDA Driver Version: " << driverVersion / 1000 << "." << (driverVersion%100)/10 << std::endl;
-    std::cout << "CUDA Runtime Version: " << runtimeVersion / 1000 << "." << (driverVersion%100)/10 << std::endl;
+    std::cout << "CUDA Runtime Version: " << runtimeVersion / 1000 << "." << (runtimeVersion%100)/10 << std::endl;
     if (runtimeVersion > driverVersion)
     {
         std::cout << "WARNING: runtime version is not supported by driver. Solver might not work properly" << std::endl;
