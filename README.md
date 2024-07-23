@@ -98,20 +98,7 @@ There are two main reasons why compilation of either the cuPSS library or a part
  - Make sure the CUDA driver version and CUDA toolkit are compatible. The CUDA driver version should be equal or greater to your installed CUDA toolkit. The version of the CUDA driver can be checked by running `nvidia-smi`, which will report the `CUDA Version` at the top right. The CUDA toolkit version can be found by running `nvcc --version`, or `/usr/local/cuda/bin/nvcc --version` if installed in the default location and not added to `PATH`. Having a more recent CUDA toolkit version might compile just fine but produce an invalid library. Solvers will show a warning in this case.
 
 ## What it calculates
-See <a href=""><strong>here</strong></a>.
-
-## What it supports
-The solver supports any number of scalar fields $\lbrace\phi_i\rbrace$ on a rectangular lattice. Nonscalar fields such as vector fields must be split into as many scalar fields as components it has.
-
-Each field $\phi_i$ can be updated through a dynamic rule, meaning it will solve an equation of the form
-$$\partial_t\phi_i(t) = F_i[\lbrace\phi_j\rbrace]$$
-or a static rule, meaning that each timestep the field is assigned a value as
-$$\phi_i(t) = G_i[\lbrace\phi_j\rbrace]$$
-Each field can be stochastic, so if it's updated through a dynamic rule, every timestep a noise term will be added according to:
-$$\partial_t\phi_i(t) = F_i[\lbrace\phi_j\rbrace] + \eta_i$$
-Where the noise is delta-correlated in space and time, or in Fourier space:
-$$\langle\tilde\eta_i(k,\omega)\eta_j(k',\omega')\rangle = 2L(k)\delta(k+k')\delta(\omega+\omega')$$,
-where $L(k)$ can be a constant or a power of wavelength $k$, allowing for several types of noise.
+See <a href="https://github.com/fcaballerop/cuPSS/wiki#what-can-it-solve"><strong>here</strong></a>.
 
 ## What it does not support (yet)
  - Compilable without CUDA so that it can run only on CPU.
