@@ -23,6 +23,8 @@ This library provides a framework for numerically integrating systems of 1st ord
 
 Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>wiki</strong></a>.
 
+cuPSS has been tested on both Linux and Windows WSL. It should run natively on Windows using the proper Windows `fftw3f` library, but it hasn't been tested. Note that Windows WSL does not support CUDA/OpenGL interoperability and thus real time visualization on WSL is not possible.
+
 ## Dependencies
 
  * CUDA toolkit (11+)
@@ -40,14 +42,14 @@ Install <a href="https://www.fftw.org/">fftw3</a> with single point precision. F
 
 ### Compiling the library
 
-To download cuPSS and test the examples, first clone the repository
+To download cuPSS and test the examples, clone the repository
 ```
 git clone https://github.com/fcaballerop/cuPSS.git
 cd cuPSS/
 ```
 
 #### Option 1: Compilation with global installation
-A CMake file is given for convenience, so cupss can be installed system wide by running (check dependencies above if any errors come up during compilation, specially fftw3 with single point precision).
+A CMake file is given for convenience, so cuPSS can be installed system wide by running (check dependencies above if any errors come up during compilation, specially fftw3 with single point precision).
 ```
 mkdir build
 cd build
@@ -56,8 +58,9 @@ cmake --build .
 sudo cmake --install .
 ```
 This will create a file `build/libcupss.a` which can the be linked to any particular solver. The last command will copy this library to `/usr/lib`, and the header files to `/usr/include`. 
+
 #### Option 2: Compilation with local installation
-If cmake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
+If CMake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
 ```
 cd src
 nvcc -c *cu -O2
@@ -67,7 +70,6 @@ cd ..
 This will create a file `src/libcupss.a` which can be linked to any particular solver. The header files are in `inc`.
 
 ### Compiling and running an example
-
 A number of example solvers can be found in the `examples` directory. They can be compiled with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/cahn-hilliars.cpp`, can be compiled by
 ```
 nvcc examples/cahn-hilliard.cpp --lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
@@ -76,18 +78,24 @@ If cupss was not installed globally, the location of `libcupss.a` must be specif
 ```
 nvcc examples/cahn-hilliard.cpp -Lsrc/ -lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
 ```
-The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located. It will be in `src/` if the library has been compiled with the lines above. The solver can be run with
+The linking flag `-Lsrc/` should be changed to wherever `libcupss.a` is located. It will be in `src/` if the library has been compiled with the lines in *Option 2* above. The solver can be run with
 ```
 ./cahn-hilliard
 ```
-The solver outputs data by default to a directory called `data` from where it's called. The output files contain raw data of the states of the field at each timestep at which they're written out.
+The solver outputs data by default to a directory called `data` from where it's called. The output files contain raw data of the states of the field at each timestep at which they're written out, which can be plotted/analysed separately.
 
-
-These two images are the results of a Cahn-Hilliard solver in 2D and 3D, available in the examples.
+These two images are the results of the spinodal decomposition of the Cahn-Hilliard solver in 2D and 3D, available in the examples.
 <div align="center">
     <img src="img/CH2D.gif" width=220 height=200>
     <img src="img/CH3D.gif" width=220 height=200>
 </div>
+
+## Troubleshooting
+
+There are two main reasons why compilation of either the cuPSS library or a particular solver might fail.
+
+ - Make sure fftw3 is available. This means compiling fftw3 from sources with single point precision, and then linking this version of the library `-lfftw3f` (notice the `f` at the end, for `float`). Single precision is not compiled automatically so needs to be specified. It should be enough to run `./configure --enable-float && make && sudo make install` from the directory of fftw3 sources.
+ - Make sure the CUDA driver version and CUDA toolkit are compatible. The CUDA driver version should be equal or greater to your installed CUDA toolkit. The version of the CUDA driver can be checked by running `nvidia-smi`, which will report the `CUDA Version` at the top right. The CUDA toolkit version can be found by running `nvcc --version`, or `/usr/local/cuda/bin/nvcc --version` if installed in the default location and not added to `PATH`. Having a more recent CUDA toolkit version might compile just fine but produce an invalid library. Solvers will show a warning in this case.
 
 ## What it calculates
 See <a href=""><strong>here</strong></a>.
