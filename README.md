@@ -21,7 +21,7 @@
 
 This library provides a framework for numerically integrating systems of 1st order PDEs (stochastic or deterministic) in a rectangular lattice, using a pseudo-spectral method. The integrator runs on NVIDIA GPUs through CUDA, but also supports running entirely on CPU, which can be faster for certain smaller systems.
 
-Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki"><strong>wiki</strong></a>.
+Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki/Tutorials"><strong>tutorials</strong></a>.
 
 cuPSS has been tested on both Linux and Windows WSL. It should run natively on Windows using the proper Windows `fftw3f` library, but it hasn't been tested. Note that Windows WSL does not support CUDA/OpenGL interoperability and thus real time visualization on WSL is not possible.
 
