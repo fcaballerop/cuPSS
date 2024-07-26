@@ -28,8 +28,6 @@ cuPSS has been tested on both Linux and Windows WSL. It should run natively on W
 ## Dependencies
 
  * CUDA toolkit (11+)
- * cuFFT
- * cuRAND
  * FFTW3 (with single point precision)
 
 ## Quickstart
