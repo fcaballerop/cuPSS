@@ -109,7 +109,7 @@ void evolver::prepareProblem()
         std::exit(1);
     }
     // copy host to device to account for initial conditions
-    _parser->writeParamsToFile("data/parameter_list.txt");
+    _parser->writeParamsToFile("data/parameter_list.txt.0");
 
     std::cout << "Preparing problem." << std::endl;
     std::cout << "Copying initial states to device if necessary." << std::endl;
@@ -435,3 +435,13 @@ float evolver::getParameter(const std::string &name)
     return _parser->getParameter(name);
 }
 
+int evolver::updateParameter(const std::string &name, float new_value)
+{
+    _parser->changeParameter(name, new_value);
+    for (int i = 0; i < fields.size(); i++)
+    {
+        fields[i]->updateParameter(name, new_value);
+    }
+    _parser->writeParamsToFile("data/parameter_list.txt." + std::to_string(currentTimeStep));
+    return 0;
+}

@@ -488,3 +488,46 @@ float field::getStepqz()
 {
     return stepqz;
 }
+
+int field::addImplicitString(const std::string &_this_term)
+{
+    implicit_prefactor_strings.push_back(_this_term);
+    return 0;
+}
+
+void field::printImplicitString()
+{
+    for (int i = 0; i < implicit_prefactor_strings.size(); i++)
+    {
+        std::cout << implicit_prefactor_strings[i] << std::endl;
+    }
+    for (const auto &x : usedParameters)
+    {
+        std::cout << x.first << " " << x.second << std::endl;
+    }
+}
+
+int field::updateParameter(const std::string &name, float value)
+{
+    int implicitsChanged = usedParameters[name];
+    
+    if (implicitsChanged)
+    {
+        int dyn = 0;
+        if (dynamic) dyn = 1;
+        system_p->_parser->recalculateImplicits(implicit_prefactor_strings, implicit, dyn);
+        precalculateImplicit(system_p->dt);
+    }
+
+    for (int i = 0; i < terms.size(); i++)
+    {
+        int termChanged = terms[i]->usedParameters[name];
+
+        if (termChanged)
+        {
+            system_p->_parser->recalculateImplicits(terms[i]->prefactor_strings, terms[i]->prefactors_h, 0);
+            terms[i]->precomputePrefactors();
+        }
+    }
+    return 0;
+}

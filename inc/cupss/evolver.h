@@ -17,7 +17,6 @@ private:
     const int sx, sy, sz;
     const float dx, dy, dz;
     const int writeEveryNSteps;
-    parser *_parser;
 public:
     int dimension;
     dim3 threads_per_block;
@@ -25,6 +24,7 @@ public:
     float dt;
     float dtsqrt;
     std::vector<field*> fields;
+    parser *_parser;
     evolver(bool, int, float, float, int);
     evolver(bool, int, int, float, float, float, int);
     evolver(bool, int, int, int, float, float, float, float, int);
@@ -75,6 +75,8 @@ public:
     void prepareProblem();
 
     void setOutputField(const std::string &, int);
+
+    int updateParameter(const std::string &, float);
 
     void initializeUniform(std::string, float);
     void initializeUniformNoise(std::string, float);

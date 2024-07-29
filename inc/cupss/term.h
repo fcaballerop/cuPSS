@@ -21,7 +21,6 @@ private:
     int copyComp();         // For when there's only one field
     int applyPrefactors();  // Fourier prefactors
     int applyPres_vector(); // Same as above but multiple
-    int precomputePrefactors();
     const int sx, sy, sz;             // system size
     const float dx, dy, dz;           // cell size
     const float stepqx, stepqy, stepqz;   // smallest wavelength, 
@@ -31,12 +30,14 @@ private:
     fftwf_plan plan_forward, plan_backward;
 
     cufftHandle plan_gpu;
+
 public:
     term(int, float);
     term(int, int, float, float);
     term(int, int, int, float, float, float);
     void common_constructor();
     int prepareDevice();
+    int precomputePrefactors();
 
     bool isCUDA;
 
@@ -64,6 +65,12 @@ public:
     dim3 blocks;
 
     int update();
+
+    // for dynamic update of parameters
+    std::map<std::string, int> usedParameters;
+    std::vector<std::string> prefactor_strings;
+    int setPrefactorString(const std::vector<std::string> &);
+    void printPrefactorString();
 };
 
 #endif

@@ -651,6 +651,7 @@ int parser::add_equation(const std::string &_equation)
     std::vector<pres> implicits;
 
     std::vector<std::vector<pres>> prefactor_vector;
+    std::vector<std::vector<std::string>> prefactor_vector_string;
     std::vector<std::vector<std::string>> fields_vector;
 
     if (lhs_terms[0].substr(0,2) == "dt")
@@ -708,10 +709,6 @@ int parser::add_equation(const std::string &_equation)
         std::sort(fields.begin(), fields.end());
 
         pres this_prefactor = get_prefactor(rhs_terms[i]);
-        // for (int j = 0; j < fields.size(); j++)
-        // {
-        //     std::cout << "Field " << j << " " << fields[j] << "\n";
-        // }
         int exists = 0;
         for (int k = 0; k < fields_vector.size(); k++)
         {
@@ -719,20 +716,27 @@ int parser::add_equation(const std::string &_equation)
             {
                 exists = 1;
                 prefactor_vector[k].push_back(this_prefactor);
+                prefactor_vector_string[k].push_back(rhs_terms[i]);
             }
         }
         if (exists == 0)
         {
             fields_vector.push_back(fields);
             prefactor_vector.push_back({this_prefactor});
+            prefactor_vector_string.push_back({rhs_terms[i]});
         }
     }
-
+    for (const auto &x : parameters)
+        system->fieldsMap[field_name]->usedParameters[x.first] = 0;
     if (!(implicits.size() == 1 && implicits[0].preFactor == 1.0f && implicits[0].q2n == 0 && implicits[0].iqx == 0 && implicits[0].iqy == 0 && implicits[0].iqz == 0 && implicits[0].invq == 0))
     {
         for (int i = 0; i < implicits.size(); i++)
         {
             system->fieldsMap[field_name]->implicit.push_back(implicits[i]);
+            system->fieldsMap[field_name]->addImplicitString(lhs_terms[i]);
+            for (const auto &x : parameters)
+                if (isParameterInString(lhs_terms[i], x.first))
+                    system->fieldsMap[field_name]->usedParameters[x.first] = 1;
         }
     }
 
@@ -741,9 +745,25 @@ int parser::add_equation(const std::string &_equation)
         std::cout << "ERROR: Inconsistent number of prefactors and fields\n";
         std::exit(1);
     }
+
     for (int i = 0; i < fields_vector.size(); i++)
     {
         system->createTerm(field_name, prefactor_vector[i], fields_vector[i]);
+        int numTerms = system->fieldsMap[field_name]->terms.size();
+        system->fieldsMap[field_name]->terms[numTerms - 1]->setPrefactorString(prefactor_vector_string[i]);
+        for (const auto &x : parameters)
+            system->fieldsMap[field_name]->terms[numTerms - 1]->usedParameters[x.first] = 0;
+        for (int j = 0; j < prefactor_vector_string[i].size(); j++)
+        {
+            // std::cout << "Processing " << prefactor_vector_string[i][j] << std::endl;
+            for (const auto &x : parameters)
+            {
+                // std::cout << "Is " << x.first << " in " << prefactor_vector_string[i][j] << "?\n";
+                // std::cout << isParameterInString(prefactor_vector_string[i][j], x.first) << std::endl;
+                if (isParameterInString(prefactor_vector_string[i][j], x.first))
+                    system->fieldsMap[field_name]->terms[numTerms - 1]->usedParameters[x.first] = 1;
+            }
+        }
     }
 
     return 0;
@@ -769,4 +789,61 @@ float parser::getParameter(const std::string &name)
         std::exit(1);
     }
     return parameters[name];
+}
+
+int parser::changeParameter(const std::string &name, float new_value)
+{
+    if (!exists_parameter(name))
+    {
+        std::cout << "ERROR: changeParameter " << name << " not found" << std::endl;
+        std::exit(1);
+    }
+    // std::cout << "Changing " << name << " from " <<
+    //             name << "=" << parameters[name] << " to " <<
+    //             name << "=" << new_value << std::endl;
+    parameters[name] = new_value;
+    // std::cout << "New set of parameters:" << std::endl;
+    // for (const auto &x : parameters)
+    // {
+    //     std::cout << x.first << "=" << x.second << std::endl;
+    // }
+    return 0;
+}
+
+
+int parser::isParameterInString(const std::string &_string, const std::string &_parameter)
+{
+    int occurrences = 0;
+    std::string local = _string;
+    if (local[0] == '+' || local[0] == '-')
+        local.erase(local.begin());
+    for (int i = 0; i < local.size(); i++)
+    {
+        if (local[i] == '/')
+        {
+            local[i] = '*';
+        }
+    }
+
+    std::vector<std::string> factors;
+    get_factors(local, factors);
+
+    for (int i = 0; i < factors.size(); i++)
+    {
+        if (factors[i] == _parameter)
+            occurrences++;
+    }
+
+    return occurrences;
+}
+
+
+int parser::recalculateImplicits(const std::vector<std::string> &_strings, std::vector<pres> &_pres, int dynamic)
+{    
+    for (int i = 0; i < _strings.size(); i++)
+    {
+        _pres[i] = get_prefactor(_strings[i]);
+        if (dynamic) _pres[i].preFactor *= -1.0;
+    }
+    return 0;
 }

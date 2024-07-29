@@ -40,8 +40,12 @@ class parser
         int exists_parameter(const std::string &);
         void writeParamsToFile(const std::string &);
         float getParameter(const std::string &);
+        int changeParameter(const std::string &, float new_value);
+        
+        int isParameterInString(const std::string &, const std::string &);
+
+        int recalculateImplicits(const std::vector<std::string> &, std::vector<pres> &, int);
         int verbose;
 };
 
 #endif
-

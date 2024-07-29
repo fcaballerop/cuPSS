@@ -39,6 +39,8 @@ class field
     curandRngType_t rng_d;
     curandOrdering_t order_d;
 
+    // for dynamic change of parameters
+    std::vector<std::string> implicit_prefactor_strings;
 
     public:
     field(int, float);
@@ -47,6 +49,7 @@ class field
     void common_constructor();
 
     std::string name;
+    std::map<std::string, int> usedParameters; // only implicits
 
     bool dynamic;
     int integrator;
@@ -144,6 +147,10 @@ class field
     float getStepqx();
     float getStepqy();
     float getStepqz();
+
+    int addImplicitString(const std::string &);
+    void printImplicitString();
+    int updateParameter(const std::string &, float);
 };
 
 #endif // FIELD_H
