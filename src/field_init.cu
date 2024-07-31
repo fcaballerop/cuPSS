@@ -178,21 +178,27 @@ field::field(int _sx, int _sy, int _sz, float _dx, float _dy, float _dz) : sx(_s
 void field::prepareDevice()
 {
     // copy implicit terms
-    check_error(cudaMalloc(reinterpret_cast<void **>(&implicit_terms), implicit.size() * sizeof(pres)));
-    cudaMemcpy(implicit_terms, &implicit[0], implicit.size() * sizeof(pres), cudaMemcpyHostToDevice);
+    if (implicit.size() > 0)
+    {
+        check_error(cudaMalloc(reinterpret_cast<void **>(&implicit_terms), implicit.size() * sizeof(pres)));
+        cudaMemcpy(implicit_terms, &implicit[0], implicit.size() * sizeof(pres), cudaMemcpyHostToDevice);
+    }
 
     // move array of pointers to terms
-    terms_h = new float2*[terms.size()];
-    check_error(cudaMalloc(reinterpret_cast<void **>(&terms_d), terms.size() * sizeof(float2*)));
-    for (int i = 0; i < terms.size(); i++)
+    if (terms.size() > 0)
     {
-        terms_h[i] = terms[i]->term_comp_d;
-    }
-    cudaMemcpy(terms_d, terms_h, terms.size() * sizeof(float2*), cudaMemcpyHostToDevice);
+        terms_h = new float2*[terms.size()];
+        check_error(cudaMalloc(reinterpret_cast<void **>(&terms_d), terms.size() * sizeof(float2*)));
+        for (int i = 0; i < terms.size(); i++)
+        {
+            terms_h[i] = terms[i]->term_comp_d;
+        }
+        cudaMemcpy(terms_d, terms_h, terms.size() * sizeof(float2*), cudaMemcpyHostToDevice);
 
-    for (int i = 0; i < terms.size(); i++)
-    {
-        terms[i]->prepareDevice();
+        for (int i = 0; i < terms.size(); i++)
+        {
+            terms[i]->prepareDevice();
+        }
     }
 }
 
