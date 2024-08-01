@@ -358,7 +358,7 @@ void field::createNoise()
     {
         switch (noiseType)
         {
-            case GaussianWhite:
+        default:
             // curandGenerateNormal(gen_d, noise_comp_d_r, sx*sy, 0.0f, 0.707f); // 1/sqrt(2)
             // cudaDeviceSynchronize();
             // curandGenerateNormal(gen_d, noise_comp_d_i, sx*sy, 0.0f, 0.707f);
