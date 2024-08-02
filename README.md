@@ -86,6 +86,7 @@ These two images are the results of the spinodal decomposition of the Cahn-Hilli
 </div>
 
 ## Troubleshooting
+The CUDA toolkit does not add its binaries location to `PATH` by default. They're installed by default in `/usr/local/cuda/bin/`. Add that directory to `PATH` or substitute all calls to `nvcc` with `/usr/local/cuda/bin/nvcc`.
 
 There are two main reasons why compilation of either the cuPSS library or a particular solver might fail.
 
