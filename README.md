@@ -67,7 +67,7 @@ This will create a file `src/libcupss.a` which can be linked to any particular s
 ### Compiling and running an example
 A number of example solvers can be found in the `examples` directory. They can be compiled with `nvcc`, linking the relevant libraries. For instance, the solver for model B, contained in `examples/cahn-hilliars.cpp`, can be compiled by
 ```
-nvcc examples/cahn-hilliard.cpp --lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
+nvcc examples/cahn-hilliard.cpp -lcufft -lfftw3f -lcurand -lcupss -O2 -o cahn-hilliard
 ```
 If cupss was not installed globally, the location of `libcupss.a` must be specified with the linker flag `-L`:
 ```
