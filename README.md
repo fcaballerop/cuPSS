@@ -16,7 +16,7 @@
 
 ## Introduction
 
-This library provides a framework for numerically integrating systems PDEs (stochastic or deterministic) pseudo-spectrally. The integrator runs on NVIDIA GPUs through CUDA, but also supports running entirely on CPU, which can be faster for certain smaller systems.
+This library provides a framework for numerically integrating systems of PDEs (stochastic or deterministic) pseudo-spectrally. The integrator runs on NVIDIA GPUs through CUDA, but also supports running entirely on CPU, which can be faster for certain smaller systems.
 
 Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki/Tutorials"><strong>tutorials</strong></a>.
 
