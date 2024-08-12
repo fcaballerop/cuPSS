@@ -46,7 +46,7 @@ public:
 
     int addParameter(std::string, float);
     int addEquation(std::string);
-    int addBoundaryCondition(std::string,BoundaryConditions);
+    int addBoundaryCondition(std::string,BoundaryCondition);
     int addNoise(std::string, std::string);
     int createFromFile(const std::string &);
     

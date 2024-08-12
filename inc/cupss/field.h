@@ -3,6 +3,7 @@
 
 #include <random>
 #include <vector>
+#include <map>
 #include <fftw3.h>
 #include <string>
 
@@ -17,7 +18,7 @@ class term;
 struct pres;
 
 class evolver;
-class BoundaryConditions;
+class BoundaryCondition;
 
 class field
 {
@@ -39,7 +40,7 @@ class field
     cudaStream_t stream_d;
     curandRngType_t rng_d;
     curandOrdering_t order_d;
-    std::vector<BoundaryConditions> boundary_conditions;
+    std::map<int,BoundaryCondition> boundary_conditions;
 
 
     public:
@@ -147,7 +148,7 @@ class field
     float getStepqy();
     float getStepqz();
 
-    void addBoundaryCondition(BoundaryConditions);
+    void addBoundaryCondition(BoundaryCondition);
     std::array<int,3> get_size(){return {sx,sy,sz};}
     std::array<float,3> get_spacing(){return {dx,dy,dz};}
 

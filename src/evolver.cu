@@ -148,7 +148,7 @@ int evolver::addEquation(std::string equation)
     return 0;
 }
 
-int evolver::addBoundaryCondition(std::string _name,BoundaryConditions BC)
+int evolver::addBoundaryCondition(std::string _name,BoundaryCondition BC)
 {
     int fieldIndex = existsField(_name);
     if (fieldIndex != -1)

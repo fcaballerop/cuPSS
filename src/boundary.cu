@@ -1,17 +1,17 @@
 #include "boundary.h"
 #include "boundary_kernels.cuh"
 
-BoundaryConditions::BoundaryConditions(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value)
+BoundaryCondition::BoundaryCondition(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value)
     :_type(type),_dimension(dimension){
         _single_value=0;
         _value_fn=value;
 }
      // 3d constructor
-BoundaryConditions::BoundaryConditions(BoundaryType type, BoundaryDirection dimension, float value)
+BoundaryCondition::BoundaryCondition(BoundaryType type, BoundaryDirection dimension, float value)
     :_type(type),_dimension(dimension),_value(value){
         _single_value=1;
     } //2d constructor
-void BoundaryConditions::initalize(field * myField){
+void BoundaryCondition::initalize(field * myField){
     // ok first thing we need to do is grab the pointer to the field
     // _field = myEvolver->fieldsMap[_fieldName]; // TO DO Name validation
     _fieldSize = myField->get_size();
@@ -72,12 +72,12 @@ void BoundaryConditions::initalize(field * myField){
         _blockDim = dim3(bx,by,bz);
     }
 }
-long BoundaryConditions::flatten_index(std::array<int,3> dimension_index)
+long BoundaryCondition::flatten_index(std::array<int,3> dimension_index)
 {
     // index = xi + nx *yi +nx *ny *zi 
     return dimension_index[0]+dimension_index[1]*_fieldSize[0]+dimension_index[2]*_fieldSize[0]*_fieldSize[1];
 }
-void BoundaryConditions::operator()(float2* fieldValues)
+void BoundaryCondition::operator()(float2* fieldValues)
 {
     switch (_type){
         case BoundaryType::Dirichlet:
@@ -89,7 +89,7 @@ void BoundaryConditions::operator()(float2* fieldValues)
 
     }
 } 
-void BoundaryConditions::applyDirichlet(float2* fieldValues) 
+void BoundaryCondition::applyDirichlet(float2* fieldValues) 
 {
     if (_with_cuda)
     {
@@ -140,7 +140,7 @@ void BoundaryConditions::applyDirichlet(float2* fieldValues)
         }
     }
 }
-void BoundaryConditions::applyVonNeumann(float2* fieldValues){
+void BoundaryCondition::applyVonNeumann(float2* fieldValues){
     if (_with_cuda)
     {
         bool leftwall = !(_dimension%2);

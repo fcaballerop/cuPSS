@@ -77,31 +77,29 @@ int field::setRHS(float dt)
     // Normalize and remove imaginary errors
     normalize();
 
-    // If there are callback functions defined for the field, they should be executed
-    // here, maybe take a pointer to a function to be called back here
-    // do BC here
-    // format theBCcall like this so that we can just register it as a callback
-    // apply to both de and regular
-
     // apply boundary conditions
-    for (int i = 0; i<boundary_conditions.size(); i++)
+    for (std::map<int,BoundaryCondition>::iterator bc = boundary_conditions.begin(); bc!=boundary_conditions.end(); bc++)
     {
+        BoundaryCondition& boundary = ((*bc).second);
         if (isCUDA)
         {
-            boundary_conditions[i](real_array_d);
+            boundary(real_array_d);
             if (needsaliasing)
             {
-                boundary_conditions[i](real_dealiased_d);
+                boundary(real_dealiased_d);
             }
         }
         else {
-            boundary_conditions[i](real_array);
+            boundary(real_array);
             if (needsaliasing)
             {
-                boundary_conditions[i](real_dealiased);
+                boundary(real_dealiased);
             }
         }
     }
+    // If there are callback functions defined for the field, they should be executed
+    // here, maybe take a pointer to a function to be called back here
+    // do BC here
 
 
     if (hasCB)
@@ -515,9 +513,8 @@ float field::getStepqz()
     return stepqz;
 }
 
-void field::addBoundaryCondition(BoundaryConditions BC)
+void field::addBoundaryCondition(BoundaryCondition BC)
 {
-    boundary_conditions.push_back(BC);
-    boundary_conditions[boundary_conditions.size()-1].initalize(this);
-
+    boundary_conditions[BC.get_direction()]=BC;
+    boundary_conditions[BC.get_direction()].initalize(this);
 }

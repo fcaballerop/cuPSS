@@ -7,7 +7,7 @@
 typedef enum {xminus,xplus,yminus,yplus,zminus,zplus} BoundaryDirection;
 typedef enum {Dirichlet,VonNeumann} BoundaryType;
 
-class BoundaryConditions {
+class BoundaryCondition {
 // this class knows if its in the x,y or z direction
 // this class has a function f(x,y,z) or f(x,y) that returns a value
 // this class knows how thick the boundary layer is
@@ -37,11 +37,12 @@ private:
     long flatten_index(std::array<int,3>);
 
 public:
-    BoundaryConditions(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value); // 3d constructor
-    BoundaryConditions(BoundaryType type, BoundaryDirection dimension, float value);
-    BoundaryConditions();
+    BoundaryCondition(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value); // 3d constructor
+    BoundaryCondition(BoundaryType type, BoundaryDirection dimension, float value);
+    BoundaryCondition(){}
     void initalize(field*);
     void operator()(float2*); // applies the boundary condition
     void applyDirichlet(float2*);
     void applyVonNeumann(float2*);
+    BoundaryDirection get_direction(){return _dimension;}
 };
