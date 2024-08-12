@@ -1,4 +1,5 @@
 utils/
+data/
 build/
 solvers/
 .cache/

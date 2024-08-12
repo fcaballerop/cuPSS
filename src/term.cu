@@ -24,6 +24,27 @@ int term::update()
     return 0;
 }
 
+int term::setPrefactorString(const std::vector<std::string> &_these_terms)
+{
+    for (int i = 0; i < _these_terms.size(); i++)
+    {
+        prefactor_strings.push_back(_these_terms[i]);
+    }
+    return 0;
+}
+
+void term::printPrefactorString()
+{
+    for (int i = 0; i < prefactor_strings.size(); i++)
+    {
+        std::cout << prefactor_strings[i] << std::endl;
+    }
+    for (const auto &x : usedParameters)
+    {
+        std::cout << x.first << " " << x.second << std::endl;
+    }
+}
+
 int term::toComp()
 {
     // Transform the real vector to Fourier space

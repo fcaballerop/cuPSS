@@ -42,6 +42,8 @@ class field
     curandOrdering_t order_d;
     std::map<int,BoundaryCondition> boundary_conditions;
 
+    // for dynamic change of parameters
+    std::vector<std::string> implicit_prefactor_strings;
 
     public:
     field(int, float);
@@ -50,6 +52,7 @@ class field
     void common_constructor();
 
     std::string name;
+    std::map<std::string, int> usedParameters; // only implicits
 
     bool dynamic;
     int integrator;
@@ -152,6 +155,9 @@ class field
     std::array<int,3> get_size(){return {sx,sy,sz};}
     std::array<float,3> get_spacing(){return {dx,dy,dz};}
 
+    int addImplicitString(const std::string &);
+    void printImplicitString();
+    int updateParameter(const std::string &, float);
 };
 
 #endif // FIELD_H

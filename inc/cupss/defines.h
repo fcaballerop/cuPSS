@@ -49,8 +49,11 @@ struct full_term
 #ifndef DEFS_H
 #define DEFS_H
 
+
 // Global definitions
 #define PI 3.1415926535f
+
+enum DeviceToRunOn {RUN_CPU, RUN_GPU};
 
 enum integrators { EULER, RK2, RK4 };
 
