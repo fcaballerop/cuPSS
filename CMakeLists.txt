@@ -9,6 +9,7 @@ project(cuPSS LANGUAGES CXX CUDA)
 
 add_library(cupss STATIC
     src/evolver.cu
+    src/initializers.cu
     src/field.cu
     src/field_init.cu
     src/field_kernels.cu
@@ -18,6 +19,7 @@ add_library(cupss STATIC
     src/term_kernels.cu
     src/boundary.cu
     src/boundary_kernels.cu
+    src/cu_utils.cu
     )
 set_property(TARGET cupss PROPERTY CUDA_ARCHITECTURES OFF)
 

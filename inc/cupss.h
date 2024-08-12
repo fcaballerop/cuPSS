@@ -1,4 +1,5 @@
 #include "cupss/defines.h"
+#include "cupss/cu_utils.h"
 #include "cupss/evolver.h"
 #include "cupss/field.h"
 #include "cupss/term.h"

@@ -20,10 +20,10 @@
 
 int main(int argc, char **argv)
 {
-    int NX = 128, NY = 128;
+    int NX = 256, NY = 256;
     float dx = 1.0, dy = 1.0;
     float dt = 0.1;
-    float output_every_n_steps = 1000;
+    float output_every_n_steps = 100;
 
     evolver system(RUN_GPU, NX, NY, dx, dy, dt, output_every_n_steps);
 

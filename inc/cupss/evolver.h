@@ -16,7 +16,6 @@ private:
     const int sx, sy, sz;
     const float dx, dy, dz;
     const int writeEveryNSteps;
-    parser *_parser;
 public:
     int dimension;
     dim3 threads_per_block;
@@ -24,6 +23,7 @@ public:
     float dt;
     float dtsqrt;
     std::vector<field*> fields;
+    parser *_parser;
     evolver(bool, int, float, float, int);
     evolver(bool, int, int, float, float, float, int);
     evolver(bool, int, int, int, float, float, float, float, int);
@@ -42,16 +42,21 @@ public:
     void addField(field *);
     int createField(std::string, bool);
     // int createTerm(std::string, pres, const std::vector<std::string> &);
-    int createTerm(std::string, const std::vector<pres> &, const std::vector<std::string> &);
+    int createTerm(const std::string &, const std::vector<pres> &, const std::vector<std::string> &);
 
-    int addParameter(std::string, float);
-    int addEquation(std::string);
-    int addBoundaryCondition(std::string,BoundaryConditions);
-    int addNoise(std::string, std::string);
+    int addParameter(const std::string &, float);
+    int addEquation(const std::string &);
+    int addNoise(const std::string &, const std::string &);
+
+    int addBoundaryCondition(const std::string &,BoundaryConditions);
+
+  
     int createFromFile(const std::string &);
     
 
-    int existsField(std::string);
+    float getParameter(const std::string &);
+
+    int existsField(const std::string &);
 
     // Global variables
     bool with_cuda;
@@ -72,14 +77,16 @@ public:
 
     void prepareProblem();
 
-    void setOutputField(std::string, int);
+    void setOutputField(const std::string &, int);
+
+    int updateParameter(const std::string &, float);
 
     void initializeUniform(std::string, float);
     void initializeUniformNoise(std::string, float);
     void initializeNormalNoise(std::string, float, float);
     void initializeHalfSystem(std::string, float, float, float, int);
     void initializeDroplet(std::string, float, float, float, float, int, int, int);
-
+    void addDroplet(std::string, float, float, float, int, int, int);
 };
 
 #endif // EVOLVER_H

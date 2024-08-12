@@ -49,6 +49,7 @@ struct full_term
 #ifndef DEFS_H
 #define DEFS_H
 
+
 // Global definitions
 #define PI 3.1415926535f
 
