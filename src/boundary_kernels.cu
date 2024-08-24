@@ -1,7 +1,8 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-#include "boundary_kernels.cuh"
+#include "../inc/cupss/boundary_kernels.cuh"
+
 extern "C" void applyDiricheltSingleValue_gpu(float2 * field_values,float value,int depth,int dimension, bool leftwall,dim3 field_size, dim3 boundary_size, dim3 blocks, dim3 threads_per_block){
     applyDirichletSingleValue<<<blocks, threads_per_block>>>(field_values,value,depth,dimension,leftwall,field_size,boundary_size);
 }

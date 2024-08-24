@@ -1,5 +1,5 @@
-#include "boundary.h"
-#include "boundary_kernels.cuh"
+#include "../inc/cupss/boundary.h"
+#include "../inc/cupss/boundary_kernels.cuh"
 
 BoundaryCondition::BoundaryCondition(BoundaryType type, BoundaryDirection dimension, std::function<float(float,float,float)> value)
     :_type(type),_dimension(dimension){

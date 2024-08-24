@@ -9,7 +9,6 @@
 #include <cuda_runtime.h>
 #include <sys/stat.h>
 #include "../inc/cupss.h"
-#include "evolver.h"
 
 void evolver::common_constructor()
 {

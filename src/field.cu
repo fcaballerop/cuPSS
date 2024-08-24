@@ -11,7 +11,6 @@
 #include <ostream>
 #include "../inc/cupss.h"
 #include "../inc/cupss/field_kernels.cuh"
-#include "field.h"
 
 int field::updateTerms()
 {
@@ -517,6 +516,7 @@ void field::addBoundaryCondition(BoundaryCondition BC)
 {
     boundary_conditions[BC.get_direction()]=BC;
     boundary_conditions[BC.get_direction()].initalize(this);
+}
 
 int field::addImplicitString(const std::string &_this_term)
 {
@@ -559,5 +559,4 @@ int field::updateParameter(const std::string &name, float value)
         }
     }
     return 0;
->>>>>>> 58484fa0cca89ba0f4f96c0ea11ac22cb2e3fec4
 }
