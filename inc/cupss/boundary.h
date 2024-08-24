@@ -26,9 +26,9 @@ private:
     float _value;
     float* _values =nullptr;
     float *d_values = nullptr; // for use when we have a BC that varies over space
-    std::array<int,3> _boundarySize;
-    std::array<int,3> _fieldSize;
-    std::array<float,3> _fieldSpacing;
+    std::vector<int> _boundarySize;
+    std::vector<int> _fieldSize;
+    std::vector<float> _fieldSpacing;
 
     dim3 _blockDim;
     dim3 _threadDim;

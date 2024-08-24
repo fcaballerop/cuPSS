@@ -161,7 +161,8 @@ int evolver::addBoundaryCondition(std::string _name,BoundaryCondition BC)
     int fieldIndex = existsField(_name);
     if (fieldIndex != -1)
         fields[fieldIndex]->addBoundaryCondition(BC);
-    
+
+    return 0;    
 }
 int evolver::existsField(const std::string &_name)
 {

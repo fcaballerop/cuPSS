@@ -152,8 +152,8 @@ class field
     float getStepqz();
 
     void addBoundaryCondition(BoundaryCondition);
-    std::array<int,3> get_size(){return {sx,sy,sz};}
-    std::array<float,3> get_spacing(){return {dx,dy,dz};}
+    std::vector<int> get_size(){return {sx,sy,sz};}
+    std::vector<float> get_spacing(){return {dx,dy,dz};}
 
     int addImplicitString(const std::string &);
     void printImplicitString();

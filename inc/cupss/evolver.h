@@ -6,6 +6,7 @@
 #include <array>
 #include "defines.h"
 #include "boundary.h"
+
 class field;
 class parser;
 struct pres;
@@ -48,7 +49,7 @@ public:
     int addEquation(const std::string &);
     int addNoise(const std::string &, const std::string &);
 
-    int addBoundaryCondition(const std::string &,BoundaryConditions);
+    int addBoundaryCondition(const std::string &, BoundaryCondition);
 
     int addParameter(std::string, float);
     int addEquation(std::string);
