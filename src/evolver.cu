@@ -9,6 +9,7 @@
 #include <cuda_runtime.h>
 #include <sys/stat.h>
 #include "../inc/cupss.h"
+#include "evolver.h"
 
 void evolver::common_constructor()
 {
@@ -156,6 +157,13 @@ int evolver::addEquation(const std::string &equation)
     return 0;
 }
 
+int evolver::addBoundaryCondition(std::string _name,BoundaryCondition BC)
+{
+    int fieldIndex = existsField(_name);
+    if (fieldIndex != -1)
+        fields[fieldIndex]->addBoundaryCondition(BC);
+    
+}
 int evolver::existsField(const std::string &_name)
 {
     int foundIndex = -1;

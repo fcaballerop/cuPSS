@@ -3,6 +3,7 @@
 
 #include <random>
 #include <vector>
+#include <map>
 #include <fftw3.h>
 #include <string>
 
@@ -17,6 +18,7 @@ class term;
 struct pres;
 
 class evolver;
+class BoundaryCondition;
 
 class field
 {
@@ -38,6 +40,7 @@ class field
     cudaStream_t stream_d;
     curandRngType_t rng_d;
     curandOrdering_t order_d;
+    std::map<int,BoundaryCondition> boundary_conditions;
 
     // for dynamic change of parameters
     std::vector<std::string> implicit_prefactor_strings;
@@ -147,6 +150,10 @@ class field
     float getStepqx();
     float getStepqy();
     float getStepqz();
+
+    void addBoundaryCondition(BoundaryCondition);
+    std::array<int,3> get_size(){return {sx,sy,sz};}
+    std::array<float,3> get_spacing(){return {dx,dy,dz};}
 
     int addImplicitString(const std::string &);
     void printImplicitString();

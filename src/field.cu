@@ -11,6 +11,7 @@
 #include <ostream>
 #include "../inc/cupss.h"
 #include "../inc/cupss/field_kernels.cuh"
+#include "field.h"
 
 int field::updateTerms()
 {
@@ -76,8 +77,31 @@ int field::setRHS(float dt)
     // Normalize and remove imaginary errors
     normalize();
 
+    // apply boundary conditions
+    for (std::map<int,BoundaryCondition>::iterator bc = boundary_conditions.begin(); bc!=boundary_conditions.end(); bc++)
+    {
+        BoundaryCondition& boundary = ((*bc).second);
+        if (isCUDA)
+        {
+            boundary(real_array_d);
+            if (needsaliasing)
+            {
+                boundary(real_dealiased_d);
+            }
+        }
+        else {
+            boundary(real_array);
+            if (needsaliasing)
+            {
+                boundary(real_dealiased);
+            }
+        }
+    }
     // If there are callback functions defined for the field, they should be executed
     // here, maybe take a pointer to a function to be called back here
+    // do BC here
+
+
     if (hasCB)
     {
         if (callback == NULL)
@@ -489,6 +513,11 @@ float field::getStepqz()
     return stepqz;
 }
 
+void field::addBoundaryCondition(BoundaryCondition BC)
+{
+    boundary_conditions[BC.get_direction()]=BC;
+    boundary_conditions[BC.get_direction()].initalize(this);
+
 int field::addImplicitString(const std::string &_this_term)
 {
     implicit_prefactor_strings.push_back(_this_term);
@@ -530,4 +559,5 @@ int field::updateParameter(const std::string &name, float value)
         }
     }
     return 0;
+>>>>>>> 58484fa0cca89ba0f4f96c0ea11ac22cb2e3fec4
 }
