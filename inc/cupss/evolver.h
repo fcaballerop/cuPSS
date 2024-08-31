@@ -77,6 +77,7 @@ public:
     void setOutputField(const std::string &, int);
 
     int updateParameter(const std::string &, float);
+    bool writeParametersOnUpdate;
 
     void initializeUniform(std::string, float);
     void initializeUniformNoise(std::string, float);

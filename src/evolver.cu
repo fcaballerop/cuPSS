@@ -15,6 +15,7 @@ void evolver::common_constructor()
     currentTime = 0.0f;
     currentTimeStep = 0;
     dtsqrt = std::sqrt(dt);
+    writeParametersOnUpdate = true;
 
     if (sz == 1)
     {
@@ -442,6 +443,7 @@ int evolver::updateParameter(const std::string &name, float new_value)
     {
         fields[i]->updateParameter(name, new_value);
     }
-    _parser->writeParamsToFile("data/parameter_list.txt." + std::to_string(currentTimeStep));
+    if (writeParametersOnUpdate)
+        _parser->writeParamsToFile("data/parameter_list.txt." + std::to_string(currentTimeStep));
     return 0;
 }

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
     system.setOutputField("phi", true);
 
-    int steps = 10000;
+    int steps = 100000;
     int check = steps/100 < 1 ? 1 : steps/100;
 
     for (int i = 0; i < steps; i++)
