@@ -20,7 +20,7 @@ This library provides a framework for numerically integrating systems of PDEs (s
 
 Detailed information about how to code a solver using this library can be found in the <a href="https://github.com/fcaballerop/cuPSS/wiki/Tutorials"><strong>tutorials</strong></a>.
 
-cuPSS has been tested on both Linux and Windows WSL. It should run natively on Windows using the proper Windows `fftw3f` library, but it hasn't been tested. Note that Windows WSL does not support CUDA/OpenGL interoperability and thus real time visualization on WSL is not possible.
+cuPSS has been tested on Linux, Windows and and Windows WSL. Note that Windows WSL does not support CUDA/OpenGL interoperability and thus real time visualization on WSL is not possible.
 
 ## Dependencies
 
