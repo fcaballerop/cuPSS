@@ -9,6 +9,9 @@
       <br/>
     <br />
     <a href="https://github.com/fcaballerop/cuPSS/wiki/Tutorials"><strong>Read the tutorials »</strong></a>
+      <br />
+      <br />
+    <a href="https://arxiv.org/abs/2405.02410"><strong>Read the preprint »</strong></a>
     <br />
     <br />
   </p>
