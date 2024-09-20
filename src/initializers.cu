@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <iomanip>
+#include <sstream>
 #include <fstream>
 #include <ostream>
 #include <string>
@@ -210,4 +211,57 @@ void evolver::addDroplet(std::string field, float val, float radius, float xi, i
             }
         }
     }
+}
+
+void evolver::initializeFromFile(std::string field, std::string file, int skiprows, char delimiter) {
+    bool found = false;
+    for (int i = 0; i < fields.size(); i++)
+        if (field == fields[i]->name)
+            found = true;
+    if (!found) {
+        std::cout << "ERROR in initialize droplet, " << field << " not found" << std::endl;
+        std::exit(1);
+    }
+    FILE *chk = fopen(file.c_str(), "r"); // ANSI C style only used to check if file exists.
+    if (chk == NULL) {
+        std::cout << "Initial file: " << file << " not found. Doing nothing" << std::endl;
+        std::exit(1);
+    }
+    else
+        fclose(chk);
+
+    std::ifstream input;
+    std::string f_name;
+    std::string posx;
+    std::string posy = "0";
+    std::string posz = "0";
+    std::string value;
+    input.open(file.c_str());
+
+    for (int i = 0; i < skiprows; i++) {
+        getline(input, posx); // throw away
+    }
+    
+    int countlines = 0;
+    for (int i = 0; i < sx*sy*sz; i++) {
+        countlines++;
+        if (!getline(input, posx, delimiter)) {
+            std::cout << "Incompatible number of lines on file " << file << ", only " << countlines << " found for a system size of " << sx*sy*sz << std::endl;
+            std::exit(1);
+        }
+        if (dimension > 1)
+            getline(input, posy, delimiter);
+        if (dimension > 2)
+            getline(input, posz, delimiter);
+        getline(input, value);
+
+        int px = std::stoi(posx);
+        int py = std::stoi(posy);
+        int pz = std::stoi(posz);
+        int index = pz*sx*sy + py*sx + px;
+        float val = std::stof(value);
+        fieldsMap[field]->real_array[index].x = val;
+    }
+
+    
 }

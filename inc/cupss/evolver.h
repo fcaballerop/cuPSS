@@ -85,6 +85,8 @@ public:
     void initializeHalfSystem(std::string, float, float, float, int);
     void initializeDroplet(std::string, float, float, float, float, int, int, int);
     void addDroplet(std::string, float, float, float, int, int, int);
+
+    void initializeFromFile(std::string field, std::string file, int skiprows, char delimiter);
 };
 
 #endif // EVOLVER_H
