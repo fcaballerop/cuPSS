@@ -12,9 +12,6 @@
 #include <iostream>
 #include "../inc/cupss.h"
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-
 #define NX 256
 #define NY 256 
 
@@ -26,17 +23,13 @@ int main(int argc, char **argv)
 
     system.addParameter("D", 1.0f);
 
-    system.addEquation("dt phi +D*q^2 = 0");
+    system.addEquation("dt phi +D*q^2*phi = 0");
 
-    // Initial state is a Gaussian distribution
-    for (int j = 0; j < NY; j++)
-    {
-        for (int i = 0; i < NX; i++)
-        {
-            int index = j * NX + i;
-            system.fieldsReal["phi"][index].x = ((float)NX) * std::exp(-(((float)i - (float)NX/2.0f)*((float)i - (float)NX/2.0f) + ((float)j - (float)NY/2.0f)*((float)j - (float)NY/2.0f))/(0.01f * (float)(NX*NX)));
-        }
-    }
+    // Initial state (a tanh() bump)
+    system.initializeDroplet("phi", NX, 0, NX/4, NX/16, NX/2, NY/2, 0);
+    
+    // Uncomment the next line to add thermal noise
+    // system.addNoise("phi", "D");
 
     system.prepareProblem();
     system.setOutputField("phi", true);
