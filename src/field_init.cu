@@ -205,6 +205,9 @@ void field::prepareDevice()
 void field::precalculateImplicit(float dt)
 {
     // int dimension = 1 + (sy==1 ? 0 : 1);
+    float dx = 2.0*PI/(stepqx * sx);
+    float dy = 2.0*PI/(stepqy * sy);
+    float dz = 2.0*PI/(stepqz * sz);
     for (int k = 0; k < sz; k++)
     {
         for (int j = 0; j < sy; j++)
@@ -237,7 +240,7 @@ void field::precalculateImplicit(float dt)
                 }
                 precomp_implicit[index] = implicitFactor;
                 // noise
-                float noiseFactor = std::sqrt(dt * 2.0f * noise_amplitude.preFactor);
+                float noiseFactor = std::sqrt(dt / (dx * dy * dz) * noise_amplitude.preFactor);
                 if (noise_amplitude.q2n != 0)
                     noiseFactor *= std::sqrt(std::pow(q2, noise_amplitude.q2n));
                 if (noise_amplitude.invq != 0)
