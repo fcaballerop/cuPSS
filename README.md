@@ -61,7 +61,7 @@ This will create a file `build/libcupss.a` which can the be linked to any partic
 If CMake is not available, or system wide installation is not possible, the library can be compiled in place, by running from the root directory
 ```
 cd src
-nvcc -c *cu -O2
+nvcc -c *cu *cpp -O2
 ar rcs libcupss.a *o
 cd ..
 ```
