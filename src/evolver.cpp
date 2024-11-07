@@ -31,7 +31,6 @@ void evolver::common_constructor()
             threads_per_block = dim3(32,32);
             int bx = (sx+31)/32;
             int by = (sy+31)/32;
-            // blocks = dim3(sx/32,sy/32);
             blocks = dim3(bx,by);
         }
     }
@@ -53,6 +52,14 @@ void evolver::common_constructor()
     {
         check_device();
     }
+}
+
+evolver::~evolver()
+{
+    for (int i = 0; i < fields.size(); i++) {
+        delete fields[i];
+    }
+    delete _parser;
 }
 
 evolver::evolver(bool _with_cuda, int _sx, float _dx, float _dt, int _ses) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1.0f), dz(1.0f), dt(_dt), writeEveryNSteps(_ses)

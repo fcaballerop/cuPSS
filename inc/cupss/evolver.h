@@ -28,6 +28,7 @@ public:
     evolver(bool, int, float, float, int);
     evolver(bool, int, int, float, float, float, int);
     evolver(bool, int, int, int, float, float, float, float, int);
+    ~evolver();
     void common_constructor();
 
     std::map<std::string, field *> fieldsMap;

@@ -74,6 +74,21 @@ void term::common_constructor()
     check_error(cudaMalloc(reinterpret_cast<void **>(&precomp_prefactor_d), sx * sy * sz * sizeof(float)));
 }
 
+term::~term()
+{
+    delete[] term_real;
+    delete[] term_comp;
+    delete[] precomp_prefactor_h;
+
+    check_error(cudaFree(term_real_d));
+    check_error(cudaFree(term_comp_d));
+
+    fftwf_destroy_plan(plan_forward);
+    fftwf_destroy_plan(plan_backward);
+
+    cufftDestroy(plan_gpu);
+}
+
 term::term(int _sx, float _dx) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1.0f), dz(1.0f), stepqx(2.0f*PI/(_dx * (float)_sx)), stepqy(2.0f*PI/(1.0f * (float)1)), stepqz(2.0f*PI/(1.0f * (float)1))
 {
     common_constructor();

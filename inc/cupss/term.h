@@ -35,6 +35,7 @@ public:
     term(int, float);
     term(int, int, float, float);
     term(int, int, int, float, float, float);
+    ~term();
     void common_constructor();
     int prepareDevice();
     int precomputePrefactors();

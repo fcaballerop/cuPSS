@@ -160,6 +160,43 @@ void field::common_constructor()
     isNoisy = false;
 }
 
+field::~field()
+{
+    delete[] real_array;
+    delete[] comp_array;
+    delete[] precomp_implicit;
+    delete[] precomp_noise;
+    delete[] noise_comp;
+    delete[] noise_gend;
+    delete[] comp_dealiased;
+    delete[] real_dealiased;
+
+    check_error(cudaFree(real_array_d));
+    check_error(cudaFree(comp_array_d));
+    check_error(cudaFree(precomp_implicit_d));
+    check_error(cudaFree(precomp_noise_d));
+    check_error(cudaFree(noise_comp_d_r));
+    check_error(cudaFree(noise_comp_d_i));
+    check_error(cudaFree(gen_noise));
+    check_error(cudaFree(noise_real));
+    check_error(cudaFree(noise_fourier));
+    check_error(cudaFree(comp_dealiased_d));
+    check_error(cudaFree(real_dealiased_d));
+
+    cufftDestroy(plan_gpu);
+
+    fftwf_destroy_plan(plan_forward);
+    fftwf_destroy_plan(plan_backward);
+    fftwf_destroy_plan(plan_forward_dealias);
+    fftwf_destroy_plan(plan_backward_dealias);
+    fftwf_destroy_plan(noise_plan);
+
+    for (int i = 0; i < terms.size(); i++)
+    {
+        delete terms[i];
+    }
+}
+
 field::field(int _sx, float _dx) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1), dz(1), stepqx(2.0f*PI/(_dx * (float)_sx)), stepqy(2.0f*PI/(1.0f * (float)1)), stepqz(2.0f*PI/(1.0f * (float)1)), rng(rd()), dist(std::normal_distribution<>(0, 1.0))
 {
     common_constructor();

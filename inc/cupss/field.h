@@ -46,6 +46,7 @@ class field
     field(int, float);
     field(int, int, float, float);
     field(int, int, int, float, float, float);
+    ~field();
     void common_constructor();
 
     std::string name;
