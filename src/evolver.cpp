@@ -437,6 +437,18 @@ float evolver::getSystemPhysicalSizeZ()
 {
     return ((float)sz)*dz;
 }
+int evolver::getCurrentTimestep()
+{
+    return currentTimeStep;
+}
+float evolver::getCurrentTime()
+{
+    return currentTime;
+}
+bool evolver::getCuda()
+{
+    return with_cuda;
+}
 
 float evolver::getParameter(const std::string &name)
 {

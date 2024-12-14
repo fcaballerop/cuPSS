@@ -18,6 +18,7 @@ add_library(cupss STATIC
     src/term_kernels.cu
     src/cu_utils.cpp
     )
+
 set_source_files_properties(src/evolver.cpp PROPERTIES LANGUAGE CUDA)
 set_source_files_properties(src/initializers.cpp PROPERTIES LANGUAGE CUDA)
 set_source_files_properties(src/field.cpp PROPERTIES LANGUAGE CUDA)
@@ -27,6 +28,8 @@ set_source_files_properties(src/term.cpp PROPERTIES LANGUAGE CUDA)
 set_source_files_properties(src/term_init.cpp PROPERTIES LANGUAGE CUDA)
 set_source_files_properties(src/cu_utils.cpp PROPERTIES LANGUAGE CUDA)
 set_property(TARGET cupss PROPERTY CUDA_ARCHITECTURES OFF)
+
+target_link_libraries(cupss PRIVATE curand cufft fftw3f)
 
 INSTALL(TARGETS cupss
     LIBRARY DESTINATION /usr/lib/

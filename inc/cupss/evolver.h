@@ -17,6 +17,9 @@ private:
     const int sx, sy, sz;
     const float dx, dy, dz;
     const int writeEveryNSteps;
+    bool with_cuda;
+    float currentTime;
+    int currentTimeStep;
 public:
     int dimension;
     dim3 threads_per_block;
@@ -31,54 +34,45 @@ public:
     ~evolver();
     void common_constructor();
 
+    // Direct access to fields
     std::map<std::string, field *> fieldsMap;
     std::map<std::string, float2 *> fieldsReal;
     std::map<std::string, float2 *> fieldsFourier;
 
+    // Getters
     int getSystemSizeX();
     int getSystemSizeY();
     int getSystemSizeZ();
     float getSystemPhysicalSizeX();
     float getSystemPhysicalSizeY();
     float getSystemPhysicalSizeZ();
+    int getCurrentTimestep();
+    float getCurrentTime();
+    bool getCuda();
+    float getParameter(const std::string &);
+    void printInformation();
 
+    // System declaration functions
     void addField(field *);
     int createField(std::string, bool);
-    // int createTerm(std::string, pres, const std::vector<std::string> &);
     int createTerm(const std::string &, const std::vector<pres> &, const std::vector<std::string> &);
-
     int addParameter(const std::string &, float);
     int addEquation(const std::string &);
     int addNoise(const std::string &, const std::string &);
     int createFromFile(const std::string &);
-
-    float getParameter(const std::string &);
-
     int existsField(const std::string &);
 
-    // Global variables
-    bool with_cuda;
-
-    float currentTime;
-    int currentTimeStep;
-
+    // Dynamics functions
     int advanceTime();
-
-    void test();
-
-    int writePrecision;
     void writeOut();
-
-    void printInformation();
-
     void copyAllDataToHost();
-
-    void prepareProblem();
-
     void setOutputField(const std::string &, int);
-
     int updateParameter(const std::string &, float);
+    int writePrecision;
     bool writeParametersOnUpdate;
+
+    // Initializing functions
+    void prepareProblem();
 
     void initializeUniform(std::string, float);
     void initializeUniformNoise(std::string, float);
@@ -86,7 +80,6 @@ public:
     void initializeHalfSystem(std::string, float, float, float, int);
     void initializeDroplet(std::string, float, float, float, float, int, int, int);
     void addDroplet(std::string, float, float, float, int, int, int);
-
     void initializeFromFile(std::string field, std::string file, int skiprows, char delimiter);
 };
 
