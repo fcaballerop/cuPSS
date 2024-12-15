@@ -29,19 +29,15 @@ class field
     fftwf_plan plan_backward;
     fftwf_plan plan_forward_dealias;
     fftwf_plan plan_backward_dealias;
-
     fftwf_plan noise_plan;
-
     cufftHandle plan_gpu;
-
     curandGenerator_t gen_d;
     cudaStream_t stream_d;
     curandRngType_t rng_d;
     curandOrdering_t order_d;
-
     // for dynamic change of parameters
     std::vector<std::string> implicit_prefactor_strings;
-
+    
     public:
     field(int, float);
     field(int, int, float, float);
@@ -51,27 +47,30 @@ class field
 
     std::string name;
     std::map<std::string, int> usedParameters; // only implicits
-
+    bool isCUDA;
+    bool outputToFile;
+    evolver *system_p;
     bool dynamic;
     int integrator;
 
-    // Random things
+    // Noise objects
     bool isNoisy;
     NoiseType noiseType;
-
     std::random_device rd;
     std::mt19937 rng;
     std::normal_distribution<> dist;
-    // float D;
 
-    bool isCUDA;
-
-    bool outputToFile;
-
-    evolver *system_p;
-
+    // Naming convention for fields:
+    // real_* : stores values in real space
+    // comp_* : stores values in Fourier space
+    // *_d    : device pointers (to GPU memory)
+    // noise is split into _r and _i (real and imaginary)
     float2 *real_array;
     float2 *comp_array;
+    float2 *real_array_d;
+    float2 *comp_array_d;
+    float2 **terms_h;
+    float2 **terms_d;
 
     bool needsaliasing;
     int aliasing_order;
@@ -80,21 +79,13 @@ class field
     float2 *comp_dealiased_d;
     float2 *real_dealiased_d;
 
+    float *gen_noise;
     float2 *noise_comp;
     float2 *noise_gend;
-
-    float *gen_noise;
     float2 *noise_real;
     float2 *noise_fourier;
-
     float *noise_comp_d_r;
     float *noise_comp_d_i;
-
-    float2 *real_array_d;
-    float2 *comp_array_d;
-
-    float2 **terms_h;
-    float2 **terms_d;
 
 
     std::vector<term *> terms;
