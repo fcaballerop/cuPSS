@@ -88,6 +88,15 @@ These two images are the results of the spinodal decomposition of the Cahn-Hilli
     <img src="img/CH3D.gif" width=220 height=200>
 </div>
 
+### Run tests
+
+There is a tests file that will run a set of unit tests for all differential operators and initialization in CPU and GPU. IT depends on the Google Testing suit, and can be run by running:
+```
+cd tests
+nvcc tests.cpp -o tests -lcupss -lcufft -lcurand -lfftw3f -lgtest
+./tests
+```
+
 ## Troubleshooting
 The CUDA toolkit does not add its binaries location to `PATH` by default. They're installed by default in `/usr/local/cuda/bin/`. Add that directory to `PATH` or substitute all calls to `nvcc` with `/usr/local/cuda/bin/nvcc`.
 
