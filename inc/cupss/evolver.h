@@ -11,8 +11,7 @@ class parser;
 
 struct pres;
 
-class evolver
-{
+class evolver {
 private:
     const int sx, sy, sz;
     const float dx, dy, dz;
@@ -20,6 +19,7 @@ private:
     bool with_cuda;
     float currentTime;
     int currentTimeStep;
+    bool verbose;
 public:
     int dimension;
     dim3 threads_per_block;
@@ -51,6 +51,8 @@ public:
     bool getCuda();
     float getParameter(const std::string &);
     void printInformation();
+    void setVerbose();
+    void unsetVerbose();
 
     // System declaration functions
     void addField(field *);

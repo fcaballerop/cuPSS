@@ -18,6 +18,7 @@
 int main(int argc, char **argv)
 {
     evolver system(RUN_GPU, NX, NY, 1.0f, 1.0f, 0.1f, 100);
+    system.setVerbose();
 
     system.createField("phi", true);
 
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
     system.initializeDroplet("phi", NX, 0, NX/4, NX/16, NX/2, NY/2, 0);
     
     // Uncomment the next line to add thermal noise
-    // system.addNoise("phi", "D");
+    system.addNoise("phi", "10*D");
 
     system.prepareProblem();
     system.setOutputField("phi", true);

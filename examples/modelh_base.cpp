@@ -11,6 +11,7 @@
 int main(int argc, char **argv)
 {
     evolver system(RUN_GPU, NX, NY, 1.0f, 1.0f, 0.1f, 100);
+    system.setVerbose();
 
     system.createField("phi", true);
     system.createField("iqxphi", false);

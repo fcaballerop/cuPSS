@@ -18,8 +18,7 @@ struct pres;
 
 class evolver;
 
-class field
-{
+class field {
     private:
     const int sx, sy, sz;
     const float dx, dy, dz;

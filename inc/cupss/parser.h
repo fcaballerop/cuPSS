@@ -5,9 +5,9 @@
 
 class evolver;
 
-class parser
-{
+class parser {
     private:
+        bool verbose;
         int populate_system();
         evolver *system;
         std::map<std::string, float> parameters;
@@ -45,7 +45,6 @@ class parser
         int isParameterInString(const std::string &, const std::string &);
 
         int recalculateImplicits(const std::vector<std::string> &, std::vector<pres> &, int);
-        int verbose;
 };
 
 #endif

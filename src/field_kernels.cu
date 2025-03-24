@@ -220,27 +220,6 @@ __global__ void setDynamic_k(float2 **terms, int len, pres *implicits, int i_len
         // Now implicit terms
         if (i_len > 0)
         {
-            // float implicitFactor = 1.0f;
-            // float qx = (i < (sx+1)/2 ? (float)i : (float)(i - sx)) * stepqx;
-            // float qy = (j < (sy+1)/2 ? (float)j : (float)(j - sy)) * stepqy;
-            // float q2 = qx*qx + qy*qy;
-            // int t = 0;
-            // for (t = 0; t < i_len; t++)
-            // {
-            //     float thisImplicit = implicits[t].preFactor;
-            //     if (implicits[t].q2n != 0)
-            //         thisImplicit *= pow(q2, implicits[t].q2n);
-            //     if (implicits[t].invq != 0)
-            //     {
-            //         float invq = 0.0f;
-            //         if (index > 0)
-            //             invq = 1.0f / sqrt(q2);
-            //         thisImplicit *= pow(invq, implicits[t].invq);
-            //     }
-            //     implicitFactor -= dt * thisImplicit;
-            // }
-            // out[index].x /= implicitFactor;
-            // out[index].y /= implicitFactor;
             out[index].x /= precomp[index];
             out[index].y /= precomp[index];
         }

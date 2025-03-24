@@ -11,8 +11,7 @@
 class field;
 
 
-class term
-{
+class term {
 private:
     int toReal();           // Backwards Fourier transform
     int toComp();           // Forwards Fourier transform

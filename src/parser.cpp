@@ -3,27 +3,23 @@
 #include <fstream>
 #include <algorithm>
 
-parser::parser(evolver *_system)
-{
+parser::parser(evolver *_system) {
     system = _system;
-    verbose = 0;
+    verbose = false;
 }
 
-int parser::createFromFile(const std::string &_file_name)
-{
+int parser::createFromFile(const std::string &_file_name) {
     std::string line;
     std::cout << "Trying to read system from " << _file_name << std::endl;
     std::ifstream infile(_file_name);
     int read_type = -1; // 0 fields, 1 parameters, 2 equations
     std::vector<std::string> equation_vector;
-    while (std::getline(infile, line))
-    {
+    while (std::getline(infile, line)) {
         std::cout << line << std::endl;
         std::istringstream iss(line);
         if (line == "" || line.substr(0,1) == "#")
             continue;
-        if (read_type == -1)
-        {
+        if (read_type == -1) {
             // must read a type
             if (line.substr(0,6) == "Fields" || line.substr(0,6) == "fields")
                 read_type = 0;
@@ -634,7 +630,8 @@ int parser::add_equation(const std::string &_equation)
     std::string equation = _equation;
     remove_spaces(equation);
 
-    std::cout << "Processing\n" << equation << "\n";
+    if (verbose)
+        std::cout << "Processing\n" << equation << "\n";
 
     int dynamic = 0;
     std::string field_name;

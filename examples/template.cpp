@@ -17,6 +17,7 @@ int main(int argc, char **argv)
     int device_to_run_on = RUN_GPU; // RUN_CPU to run on CPU
 
     evolver system(device_to_run_on, NX, NY, NZ, dx, dy, dz, dt, outputfreq);
+    system.setVerbose();
 
     system.addParameter("D", 1.0f);
     

@@ -10,138 +10,124 @@
 #include <sys/stat.h>
 #include "../inc/cupss.h"
 
-void evolver::common_constructor()
-{
+void evolver::common_constructor() {
     currentTime = 0.0f;
     currentTimeStep = 0;
     dtsqrt = std::sqrt(dt);
     writeParametersOnUpdate = true;
-
-    if (sz == 1)
-    {
-        if (sy == 1)
-        {
-            dimension = 1;
-            blocks = 1;
-            threads_per_block = sx;
-        }
-        else 
-        {
-            dimension = 2;
-            threads_per_block = dim3(32,32);
-            int bx = (sx+31)/32;
-            int by = (sy+31)/32;
-            blocks = dim3(bx,by);
-        }
-    }
-    else 
-    {
-        dimension = 3;
-        threads_per_block = dim3(16, 8, 8);
-        int bx = (sx+15)/16;
-        int by = (sy+7)/8;
-        int bz = (sz+7)/8;
-
-        blocks = dim3(bx,by,bz);
-    }
-
     writePrecision = 6;
     _parser = new parser(this);
 
-    if (with_cuda)
-    {
-        check_device();
+    if (sz == 1 && sy == 1) { // 1D
+        dimension = 1;
+        blocks = 1;
+        threads_per_block = sx;
+    }
+    else if (sz == 1) { // 2D
+        dimension = 2;
+        threads_per_block = dim3(32,32);
+        blocks = dim3((sx+31)/32, (sy+31)/32);
+    }
+    else { // 3D
+        dimension = 3;
+        threads_per_block = dim3(16, 8, 8);
+        blocks = dim3((sx+15)/16, (sy+7)/8, (sz+7)/8);
+    }
+
+    if (with_cuda) {
+        if (verbose)
+            check_device();
     }
 }
 
-evolver::~evolver()
-{
+evolver::~evolver() {
     for (int i = 0; i < fields.size(); i++) {
         delete fields[i];
     }
     delete _parser;
 }
 
-evolver::evolver(bool _with_cuda, int _sx, float _dx, float _dt, int _ses) : sx(_sx), sy(1), sz(1), dx(_dx), dy(1.0f), dz(1.0f), dt(_dt), writeEveryNSteps(_ses)
-{
+evolver::evolver(bool _with_cuda, int _sx, float _dx, float _dt, int _ses) : 
+                    sx(_sx), sy(1), sz(1), 
+                    dx(_dx), dy(1.0f), dz(1.0f), 
+                    dt(_dt), writeEveryNSteps(_ses) {
     std::srand(time(0));
     with_cuda = _with_cuda;
     
     common_constructor();
 }
 
-evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float _dt, int _ses) : sx(_sx), sy(_sy), sz(1), dx(_dx), dy(_dy), dz(1.0f), dt(_dt), writeEveryNSteps(_ses)
-{
+evolver::evolver(bool _with_cuda, int _sx, int _sy, float _dx, float _dy, float _dt, int _ses) : 
+                    sx(_sx), sy(_sy), sz(1), 
+                    dx(_dx), dy(_dy), dz(1.0f), 
+                    dt(_dt), writeEveryNSteps(_ses) {
     std::srand(time(NULL));
     with_cuda = _with_cuda;
 
     common_constructor();
 }
 
-evolver::evolver(bool _with_cuda, int _sx, int _sy, int _sz, float _dx, float _dy, float _dz, float _dt, int _ses) : sx(_sx), sy(_sy), sz(_sz), dx(_dx), dy(_dy), dz(_dz), dt(_dt), writeEveryNSteps(_ses)
-{
+evolver::evolver(bool _with_cuda, int _sx, int _sy, int _sz, float _dx, float _dy, float _dz, float _dt, int _ses) : 
+                    sx(_sx), sy(_sy), sz(_sz), 
+                    dx(_dx), dy(_dy), dz(_dz), 
+                    dt(_dt), writeEveryNSteps(_ses) {
     std::srand(time(NULL));
     with_cuda = _with_cuda;
-
+    verbose = false;
     common_constructor();
 }
 
-int evolver::createFromFile(const std::string &file)
-{
+int evolver::createFromFile(const std::string &file) {
     _parser->createFromFile(file);
     return 0;
 }
 
-void evolver::prepareProblem()
-{
+void evolver::prepareProblem() {
     struct stat info;
     std::string pathname = "data";
 
-    if ( stat( pathname.c_str(), &info ) != 0 )
-    {
-        std::cout << "data directory not found, creating it.\n";
+    if ( stat( pathname.c_str(), &info ) != 0 ) {
+        if (verbose)
+            std::cout << "data directory not found, creating it.\n";
         int dir_err = mkdir(pathname.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         if (dir_err == -1) {
             std::cout << "Error creating data directory\n";
             std::exit(1);
         }
     }
-    else if ( info.st_mode & S_IFDIR )
-    {
+    else if ( info.st_mode & S_IFDIR ) {
         // data directory already exists, do nothing
-        std::cout << "data directory already found, might rewrite output data.\n";
+        if (verbose)
+            std::cout << "data directory already found, might rewrite output data.\n";
     }
-    else 
-    {
+    else {
         std::cout << "Can't create data directory, is there a file called data?\n";
         std::exit(1);
     }
     // copy host to device to account for initial conditions
     _parser->writeParamsToFile("data/parameter_list.txt.0");
 
-    std::cout << "Preparing problem." << std::endl;
-    std::cout << "Copying initial states to device if necessary." << std::endl;
-    for (int i = 0; i < fields.size(); i++)
-    {
+    if (verbose) {
+        std::cout << "Preparing problem." << std::endl;
+        std::cout << "Copying initial states to device if necessary." << std::endl;
+    }
+    for (int i = 0; i < fields.size(); i++) {
         fields[i]->copyHostToDevice();
         fields[i]->toComp();
     }
     // for each field prepare device and precalculate implicits
-    std::cout << "Preparing device and precalculating implicit matrices." << std::endl;
-    for (int i = 0; i < fields.size(); i++)
-    {
+    if (verbose)
+        std::cout << "Preparing device and precalculating implicit matrices." << std::endl;
+    for (int i = 0; i < fields.size(); i++) {
         fields[i]->prepareDevice();
         fields[i]->precalculateImplicit(dt);
         fields[i]->system_p = this;
     }
 }
 
-void evolver::setOutputField(const std::string &_name, int _output)
-{
-    for (int i = 0; i < fields.size(); i++)
-    {
-        if (fields[i]->name == _name)
-        {
+void evolver::setOutputField(const std::string &_name, int _output) {
+    for (int i = 0; i < fields.size(); i++) {
+        if (fields[i]->name == _name) {
             if (_output)
                 fields[i]->outputToFile = true;
             else
@@ -152,25 +138,20 @@ void evolver::setOutputField(const std::string &_name, int _output)
     std::cout << "setOutputField EROR: " << _name << " not found." << std::endl;
 }
 
-int evolver::addParameter(const std::string &_name, float value)
-{
+int evolver::addParameter(const std::string &_name, float value) {
     _parser->insert_parameter(_name, value);
     return 0;
 }
 
-int evolver::addEquation(const std::string &equation)
-{
+int evolver::addEquation(const std::string &equation) {
     _parser->add_equation(equation);
     return 0;
 }
 
-int evolver::existsField(const std::string &_name)
-{
+int evolver::existsField(const std::string &_name) {
     int foundIndex = -1;
-    for (int i = 0; i < fields.size(); i++)
-    {
-        if (fields[i]->name == _name)
-        {
+    for (int i = 0; i < fields.size(); i++) {
+        if (fields[i]->name == _name) {
             foundIndex = i;
             return foundIndex;
         }
@@ -178,10 +159,8 @@ int evolver::existsField(const std::string &_name)
     return foundIndex;
 }
 
-int evolver::addNoise(const std::string &_name, const std::string &equation)
-{
-    if (existsField(_name) == -1)
-    {
+int evolver::addNoise(const std::string &_name, const std::string &equation) {
+    if (existsField(_name) == -1) {
         std::cout << "Adding noise to non existing field! (" << _name << ")" << std::endl;
         return -1;
     }
@@ -191,17 +170,13 @@ int evolver::addNoise(const std::string &_name, const std::string &equation)
     return 0;
 }
 
-void evolver::addField(field *newField)
-{
+void evolver::addField(field *newField) {
     fields.push_back(newField);
 }
 
-int evolver::createField(std::string name, bool dynamic)
-{
-    for (int i = 0; i < fields.size(); i++)
-    {
-        if (fields[i]->name == name)
-        {
+int evolver::createField(std::string name, bool dynamic) {
+    for (int i = 0; i < fields.size(); i++) {
+        if (fields[i]->name == name) {
             std::cout << "Trying to create field with name that already exists" << std::endl;
             return 1;
         }
@@ -221,32 +196,26 @@ int evolver::createField(std::string name, bool dynamic)
 }
 
 
-int evolver::advanceTime()
-{
-    if (currentTimeStep % writeEveryNSteps == 0)
-    {
+int evolver::advanceTime() {
+    if (currentTimeStep % writeEveryNSteps == 0) {
         // Maybe calculate observables and write them out
         writeOut();
     }
-    // Loop over each field 
+    // Loop over each field, 
         // Calculate RHSs
-    for (int i = 0; i < fields.size(); i++)
-    {
+    for (int i = 0; i < fields.size(); i++) {
         if (!fields[i]->dynamic)
             fields[i]->updateTerms();
     }
-    for (int i = 0; i < fields.size(); i++)
-    {
+    for (int i = 0; i < fields.size(); i++) {
         if (!fields[i]->dynamic)
             fields[i]->setRHS(dt); 
     }
-    for (int i = 0; i < fields.size(); i++)
-    {
+    for (int i = 0; i < fields.size(); i++) {
         if (fields[i]->dynamic)
             fields[i]->updateTerms();
     }
-    for (int i = 0; i < fields.size(); i++)
-    {
+    for (int i = 0; i < fields.size(); i++) {
         if (fields[i]->dynamic)
             fields[i]->setRHS(dt); 
     }
@@ -256,16 +225,16 @@ int evolver::advanceTime()
     return 0;
 }
 
-void evolver::writeOut()
-{
-    for (int f = 0; f < fields.size(); f++)
-    {
+void evolver::writeOut() {
+    for (int f = 0; f < fields.size(); f++) {
         fields[f]->writeToFile(currentTimeStep, dimension, writePrecision);
     }
 }
 
-void evolver::printInformation()
-{
+void evolver::setVerbose() { verbose = true; }
+void evolver::unsetVerbose() { verbose = false; }
+
+void evolver::printInformation() {
     std::cout << std::fixed;
     std::cout << std::setprecision(3);
     std::cout << "Information on this evolver:" << std::endl;
@@ -274,8 +243,8 @@ void evolver::printInformation()
         << (float)sy*dy << "x" << (float)sz*dz << " with cells of size " 
         << dx << "x" << dy << "x" << dz << std::endl;
     std::cout << "There are " << fields.size() << " fields." << std::endl;
-    for (int i = 0; i < fields.size(); i++)
-    {
+
+    for (int i = 0; i < fields.size(); i++) {
         std::cout << "Field " << i << ": " << fields[i]->name;
         if (fields[i]->dynamic) std::cout << " is dynamic.";
         else std::cout << " is not dynamic";
@@ -291,11 +260,9 @@ void evolver::printInformation()
         std::cout << fields[i]->name;
         if (fields[i]->dynamic) std::cout << " = ";
 
-        if (fields[i]->implicit.size() > 0)
-        {
+        if (fields[i]->implicit.size() > 0) {
             std::string implicitLine = "[";
-            for (int j = 0; j < fields[i]->implicit.size(); j++)
-            {
+            for (int j = 0; j < fields[i]->implicit.size(); j++) {
                 float pre = fields[i]->implicit[j].preFactor;
                 if (pre > 0.0f) implicitLine += "+";
                 implicitLine += std::to_string(pre);
@@ -316,13 +283,11 @@ void evolver::printInformation()
         }
         if (!fields[i]->dynamic)
             std::cout << " = ";
-        for (int j = 0; j < fields[i]->terms.size(); j++)
-        {
+        for (int j = 0; j < fields[i]->terms.size(); j++) {
             std::string line = "";
             if(j != 0) line = " + [";
             else line = " [";
-            for (int p = 0; p < fields[i]->terms[j]->prefactors_h.size(); p++)
-            {
+            for (int p = 0; p < fields[i]->terms[j]->prefactors_h.size(); p++) {
                 float pre = fields[i]->terms[j]->prefactors_h[p].preFactor;
                 line += " + (" + std::to_string(pre) + ")";
                 if (fields[i]->terms[j]->prefactors_h[p].iqx != 0)
@@ -345,8 +310,7 @@ void evolver::printInformation()
             line += " )";
             std::cout << line;
         }
-        if (fields[i]->isNoisy)
-        {
+        if (fields[i]->isNoisy) {
             std::cout << "+ sqrt[2*" << fields[i]->noise_amplitude.preFactor;
             if (fields[i]->noise_amplitude.q2n != 0)
                 std::cout << "*q^" << fields[i]->noise_amplitude.q2n * 2;
@@ -359,21 +323,17 @@ void evolver::printInformation()
     }
 }
 
-int evolver::createTerm(const std::string &_field, const std::vector<pres> &_prefactors, const std::vector<std::string> &_product)
-{
+int evolver::createTerm(const std::string &_field, const std::vector<pres> &_prefactors, const std::vector<std::string> &_product) {
     int field_index = -1;
 
-    for (int i = 0; i < fields.size(); i++)
-    {
-        if (fields[i]->name == _field)
-        {
+    for (int i = 0; i < fields.size(); i++) {
+        if (fields[i]->name == _field) {
             field_index = i;
             break;
         }
     }
 
-    if (field_index == -1)
-    {
+    if (field_index == -1) {
         std::cout << "Field " << _field << " not found trying to create term" << std::endl;
         return 1;
     }
@@ -381,20 +341,16 @@ int evolver::createTerm(const std::string &_field, const std::vector<pres> &_pre
     term *newTerm = new term(sx, sy, sz, dx, dy, dz);
     newTerm->isCUDA = with_cuda;
 
-    for (int i = 0; i < _product.size(); i++)
-    {
+    for (int i = 0; i < _product.size(); i++) {
         std::string fieldForProduct = _product[i];
-        for (int j = 0; j < fields.size(); j++)
-        {
-            if (fieldForProduct == fields[j]->name)
-            {
+        for (int j = 0; j < fields.size(); j++) {
+            if (fieldForProduct == fields[j]->name) {
                 newTerm->product.push_back(fields[j]);
             }
         }
     }
 
-    for (int i = 0; i < _prefactors.size(); i++)
-    {
+    for (int i = 0; i < _prefactors.size(); i++) {
         newTerm->prefactors_h.push_back(_prefactors[i]);
     }
 
@@ -405,61 +361,31 @@ int evolver::createTerm(const std::string &_field, const std::vector<pres> &_pre
     return 0;
 }
 
-void evolver::copyAllDataToHost()
-{
-    for (int i = 0; i < fields.size(); i++)
-    {
+void evolver::copyAllDataToHost() {
+    for (int i = 0; i < fields.size(); i++) {
         fields[i]->copyDeviceToHost();
     }
 }
 
-int evolver::getSystemSizeX()
-{
-    return sx;
-}
-int evolver::getSystemSizeY()
-{
-    return sy;
-}
-int evolver::getSystemSizeZ()
-{
-    return sz;
-}
-float evolver::getSystemPhysicalSizeX()
-{
-    return ((float)sx)*dx;
-}
-float evolver::getSystemPhysicalSizeY()
-{
-    return ((float)sy)*dy;
-}
-float evolver::getSystemPhysicalSizeZ()
-{
-    return ((float)sz)*dz;
-}
-int evolver::getCurrentTimestep()
-{
-    return currentTimeStep;
-}
-float evolver::getCurrentTime()
-{
-    return currentTime;
-}
-bool evolver::getCuda()
-{
-    return with_cuda;
-}
+int evolver::getSystemSizeX() { return sx; }
+int evolver::getSystemSizeY() { return sy; }
+int evolver::getSystemSizeZ() { return sz; }
 
-float evolver::getParameter(const std::string &name)
-{
+float evolver::getSystemPhysicalSizeX() { return ((float)sx)*dx; }
+float evolver::getSystemPhysicalSizeY() { return ((float)sy)*dy; }
+float evolver::getSystemPhysicalSizeZ() { return ((float)sz)*dz; }
+
+int evolver::getCurrentTimestep() { return currentTimeStep; }
+float evolver::getCurrentTime() { return currentTime; }
+bool evolver::getCuda() { return with_cuda; }
+
+float evolver::getParameter(const std::string &name) {
     return _parser->getParameter(name);
 }
 
-int evolver::updateParameter(const std::string &name, float new_value)
-{
+int evolver::updateParameter(const std::string &name, float new_value) {
     _parser->changeParameter(name, new_value);
-    for (int i = 0; i < fields.size(); i++)
-    {
+    for (int i = 0; i < fields.size(); i++) {
         fields[i]->updateParameter(name, new_value);
     }
     if (writeParametersOnUpdate)
