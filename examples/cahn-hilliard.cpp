@@ -34,7 +34,6 @@ int main(int argc, char **argv)
 
     system.initializeNormalNoise("phi", 0.0, 0.1);
     system.setOutputField("phi", true);
-    system.setOutputField("iqxphi", true);
 
     system.prepareProblem();
     int steps = 100000;

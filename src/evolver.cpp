@@ -34,10 +34,6 @@ void evolver::common_constructor() {
         blocks = dim3((sx+15)/16, (sy+7)/8, (sz+7)/8);
     }
 
-    if (with_cuda) {
-        if (verbose)
-            check_device();
-    }
 }
 
 evolver::~evolver() {
@@ -83,6 +79,10 @@ int evolver::createFromFile(const std::string &file) {
 }
 
 void evolver::prepareProblem() {
+    if (with_cuda) {
+        if (verbose)
+            check_device();
+    }
     struct stat info;
     std::string pathname = "data";
 
