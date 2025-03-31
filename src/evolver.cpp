@@ -17,6 +17,7 @@ void evolver::common_constructor() {
     writeParametersOnUpdate = true;
     writePrecision = 6;
     _parser = new parser(this);
+    verbose = false;
 
     if (sz == 1 && sy == 1) { // 1D
         dimension = 1;
@@ -69,7 +70,6 @@ evolver::evolver(bool _with_cuda, int _sx, int _sy, int _sz, float _dx, float _d
                     dt(_dt), writeEveryNSteps(_ses) {
     std::srand(time(NULL));
     with_cuda = _with_cuda;
-    verbose = false;
     common_constructor();
 }
 
