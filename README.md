@@ -88,9 +88,9 @@ These two images are the results of the spinodal decomposition of the Cahn-Hilli
     <img src="img/CH3D.gif" width=220 height=200>
 </div>
 
-### Run tests
+### Running tests
 
-There is a tests file that will run a set of unit tests for all differential operators and initialization in CPU and GPU. IT depends on the Google Testing suit, and can be run by running:
+There is a tests file that will run a set of unit tests for all differential operators and initialization in CPU and GPU. It depends on the Google Testing suit, run the following to check cuPSS is working properly:
 ```
 cd tests
 nvcc tests.cpp -o tests -lcupss -lcufft -lcurand -lfftw3f -lgtest
