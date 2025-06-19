@@ -76,12 +76,12 @@ public:
     // Initializing functions
     void prepareProblem();
 
-    void initializeUniform(std::string, float);
-    void initializeUniformNoise(std::string, float);
-    void initializeNormalNoise(std::string, float, float);
-    void initializeHalfSystem(std::string, float, float, float, int);
-    void initializeDroplet(std::string, float, float, float, float, int, int, int);
-    void addDroplet(std::string, float, float, float, int, int, int);
+    void initializeUniform(std::string field, float value);
+    void initializeUniformNoise(std::string field, float amplitude);
+    void initializeNormalNoise(std::string field, float mean, float sigma);
+    void initializeHalfSystem(std::string field, float value1, float value2, float interface_width, int direction);
+    void initializeDroplet(std::string field, float value_out, float value_in, float radius, float interface_width, int center_x, int center_y, int center_z);
+    void addDroplet(std::string field, float value, float radius, float interface_width, int center_x, int center_y, int center_z);
     void initializeFromFile(std::string field, std::string file, int skiprows, char delimiter);
 };
 

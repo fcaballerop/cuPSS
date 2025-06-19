@@ -59,6 +59,7 @@ int field::setRHS(float dt) {
     if (needsaliasing) {
         dealias();
     }
+
     // Transform to Real space
     toReal();
     // Normalize and remove imaginary errors
