@@ -8,7 +8,7 @@
  */
 
 #include <iostream>
-#include <cupss.h>
+#include "../../inc/cupss.h"
 
 void printProgressbar(int step, int total);
 
