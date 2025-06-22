@@ -43,8 +43,6 @@ int main() {
         sys.fieldsMap["v"]->real_array[i].x -= sys.fieldsMap["h"]->real_array[i].x;
     }
     
-    
-    
     sys.addEquation("u = v + h");
     
     sys.fieldsMap["v"]->hasCB = true;
